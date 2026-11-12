@@ -92,7 +92,6 @@ export class AuthService {
   }
 
   async logout(res: Response) {
-    // this.setCookie(res, 'refreshToken', new Date(0));
     res.clearCookie('refreshToken', {
       httpOnly: true,
       secure: !isDev(this.configService),
@@ -128,6 +127,27 @@ export class AuthService {
     return this.auth(resp, user.id);
   }
 
+  async validate(id: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Пользователь не найден');
+    }
+
+    return user;
+  }
+
   private generateTokens(id: string) {
     const payload: JwtPayload = { id };
 
@@ -148,7 +168,6 @@ export class AuthService {
   private setCookie(res: Response, value: string, expires: Date) {
     res.cookie('refreshToken', value, {
       httpOnly: true,
-      // domain: this.COOKIE_DOMAIN,
       expires,
       secure: !isDev(this.configService),
       sameSite: isDev(this.configService) ? 'lax' : 'none',

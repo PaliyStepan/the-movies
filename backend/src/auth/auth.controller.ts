@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { RegisterRequest } from './dto/register.dto.js';
@@ -13,14 +14,17 @@ import { LoginRequest } from './dto/login.dto.js';
 import type { Response, Request } from 'express';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
-  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AuthResponse } from './dto/auth.dto.js';
+import { Authorization } from './decorators/authorization.decorator.js';
+import { Authorized } from './decorators/authorized.decorator.js';
+import type { User } from '../generated/prisma/client';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -96,5 +100,13 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async logout(@Res({ passthrough: true }) res: Response) {
     return await this.authService.logout(res);
+  }
+
+  @Authorization()
+  @ApiBearerAuth()
+  @Get('@me')
+  @HttpCode(HttpStatus.OK)
+  async me(@Authorized() user: User) {
+    return user;
   }
 }
