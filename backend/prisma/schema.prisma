@@ -24,3 +24,23 @@ model User {
 
   @@map("users")
 }
+
+
+model Movie {
+  id               String   @id @default(uuid())
+  tmdbId           Int      @unique @map("tmdb_id")
+  title            String
+  originalTitle    String?  @map("original_title")
+  originalLanguage String?  @map("original_language")
+  year             Int?
+  description      String?
+  posterPath       String?  @map("poster_path")
+  backdropPath     String?  @map("backdrop_path")
+  tmdbRating       Float?   @map("tmdb_rating")
+  voteCount        Int?     @map("vote_count")
+  genreIds         Int[]    @map("genre_ids")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("movies")
+}

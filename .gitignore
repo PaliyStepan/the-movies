@@ -34,3 +34,4 @@ AGENTS.md
 
 *.tsbuildinfo
 api.http
+backend/prisma/data/
