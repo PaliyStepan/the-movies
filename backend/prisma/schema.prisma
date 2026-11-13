@@ -21,14 +21,14 @@ model User {
   name      String
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  movies    Movie[]
 
   @@map("users")
 }
 
-
 model Movie {
   id               String   @id @default(uuid())
-  tmdbId           Int      @unique @map("tmdb_id")
+  tmdbId           Int?     @unique @map("tmdb_id")
   title            String
   originalTitle    String?  @map("original_title")
   originalLanguage String?  @map("original_language")
@@ -41,6 +41,8 @@ model Movie {
   genreIds         Int[]    @map("genre_ids")
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
+  createdById      String?  @map("created_by_id")
+  createdBy        User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
 
   @@map("movies")
 }
