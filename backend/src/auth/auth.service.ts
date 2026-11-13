@@ -8,7 +8,7 @@ import { SignOptions } from 'jsonwebtoken';
 import { LoginRequest } from './dto/login.dto.js';
 import { Response, Request } from 'express';
 import { isDev } from '../utils/is-dev.util.js';
-import type { JwtPayload } from '@the-movies/shared';
+import type { IJwtPayload } from '@the-movies/shared';
 
 @Injectable()
 export class AuthService {
@@ -107,10 +107,10 @@ export class AuthService {
       throw new UnauthorizedException('Недействительный токен');
     }
 
-    let payload: JwtPayload;
+    let payload: IJwtPayload;
 
     try {
-      payload = await this.jwtService.verifyAsync<JwtPayload>(refreshToken);
+      payload = await this.jwtService.verifyAsync<IJwtPayload>(refreshToken);
     } catch {
       throw new UnauthorizedException('Недействительный токен');
     }
@@ -149,7 +149,7 @@ export class AuthService {
   }
 
   private generateTokens(id: string) {
-    const payload: JwtPayload = { id };
+    const payload: IJwtPayload = { id };
 
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: this.JWT_ACCESS_TOKEN_TTL as SignOptions['expiresIn'],

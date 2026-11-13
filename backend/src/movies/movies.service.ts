@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import type { MovieListQuery, Paginated, Movie } from '@the-movies/shared';
+import type { IMovieListQuery, IPaginated, IMovie } from '@the-movies/shared';
 import type { Prisma } from '../generated/prisma/client.js';
 import { CreateMovieDto } from './dto/create-movie.dto.js';
 import { UpdateMovieDto } from './dto/update-movie.dto.js';
@@ -13,7 +13,7 @@ import { UpdateMovieDto } from './dto/update-movie.dto.js';
 export class MoviesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(query: MovieListQuery): Promise<Paginated<Movie>> {
+  async findAll(query: IMovieListQuery): Promise<IPaginated<IMovie>> {
     const search = query.search?.trim() ?? '';
 
     if (search.length < 3) {
@@ -57,13 +57,13 @@ export class MoviesService {
     };
   }
 
-  async findOne(id: string): Promise<Movie> {
+  async findOne(id: string): Promise<IMovie> {
     const movie = await this.prisma.movie.findUnique({ where: { id } });
     if (!movie) throw new NotFoundException('Фильм не найден');
     return this.toResponse(movie);
   }
 
-  async create(dto: CreateMovieDto, userId: string): Promise<Movie> {
+  async create(dto: CreateMovieDto, userId: string): Promise<IMovie> {
     const movie = await this.prisma.movie.create({
       data: {
         title: dto.title,
@@ -97,7 +97,7 @@ export class MoviesService {
     genreIds: number[];
     createdAt: Date;
     updatedAt: Date;
-  }): Movie {
+  }): IMovie {
     return {
       ...movie,
       createdAt: movie.createdAt.toISOString(),
@@ -109,7 +109,7 @@ export class MoviesService {
     id: string,
     dto: UpdateMovieDto,
     userId: string,
-  ): Promise<Movie> {
+  ): Promise<IMovie> {
     const movie = await this.prisma.movie.findUnique({ where: { id } });
 
     if (!movie) {

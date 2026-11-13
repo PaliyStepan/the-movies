@@ -1,7 +1,7 @@
 export const TMDB_POSTER_BASE = 'https://image.tmdb.org/t/p/w500';
 export const TMDB_BACKDROP_BASE = 'https://image.tmdb.org/t/p/w1280';
 
-export interface Movie {
+export interface IMovie {
   id: string;
   tmdbId: number | null;
   title: string;
@@ -18,7 +18,7 @@ export interface Movie {
   updatedAt: string;
 }
 
-export interface MovieListQuery {
+export interface IMovieListQuery {
   search?: string;
   page?: number;
   limit?: number;
@@ -26,7 +26,7 @@ export interface MovieListQuery {
   order?: 'asc' | 'desc';
 }
 
-export interface Paginated<T> {
+export interface IPaginated<T> {
   items: T[];
   total: number;
   page: number;
@@ -34,10 +34,10 @@ export interface Paginated<T> {
   totalPages: number;
 }
 
-export function getPosterUrl(movie: Pick<Movie, 'posterPath'>): string | null {
+export function getPosterUrl(movie: Pick<IMovie, 'posterPath'>): string | null {
   return movie.posterPath ? `${TMDB_POSTER_BASE}${movie.posterPath}` : null;
 }
 
-export function getBackdropUrl(movie: Pick<Movie, 'backdropPath'>): string | null {
+export function getBackdropUrl(movie: Pick<IMovie, 'backdropPath'>): string | null {
   return movie.backdropPath ? `${TMDB_BACKDROP_BASE}${movie.backdropPath}` : null;
 }

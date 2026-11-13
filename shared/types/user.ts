@@ -1,1 +1,7 @@
-export type TTest = string
+export interface IUserPublic {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}

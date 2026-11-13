@@ -20,7 +20,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { MoviesService } from './movies.service.js';
-import { MovieListQueryDto } from './dto/movie-list-query.dto.js';
+import { IMovieListQueryDto } from './dto/movie-list-query.dto.js';
 import { Authorization } from '../auth/decorators/authorization.decorator.js';
 import { CreateMovieDto } from './dto/create-movie.dto.js';
 import { Authorized } from '../auth/decorators/authorized.decorator.js';
@@ -38,7 +38,7 @@ export class MoviesController {
       'Пагинированный список фильмов. Поиск работает только при search ≥ 3 символов. Если search пуст или короче — возвращается пустой список.',
   })
   @ApiOkResponse({ description: 'Пагинированный список фильмов' })
-  findAll(@Query() query: MovieListQueryDto) {
+  findAll(@Query() query: IMovieListQueryDto) {
     return this.moviesService.findAll(query);
   }
 

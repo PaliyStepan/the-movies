@@ -3,6 +3,7 @@ node_modules/
 
 # Build
 dist/
+dist-ssr/
 build/
 
 # Env
@@ -13,17 +14,37 @@ build/
 # Prisma generated client
 backend/src/generated/prisma/
 
+# Prisma data (CSV datasets — не коммитим)
+backend/prisma/data/
+
 # Logs
+logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# TypeScript
+*.tsbuildinfo
 
 # IDE
 .idea/
 .vscode/*
 !.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # OS
 .DS_Store
 Thumbs.db
+
+# Vite
+*.local
 
 # AI agent skills (not part of the project)
 .agents/
@@ -32,6 +53,5 @@ Thumbs.db
 skills-lock.json
 AGENTS.md
 
-*.tsbuildinfo
+# HTTP client (локальные запросы)
 api.http
-backend/prisma/data/

@@ -2,7 +2,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
-export class MovieListQueryDto {
+export class IMovieListQueryDto {
   @ApiPropertyOptional({
     description: 'Поиск по названию или описанию (минимум 3 символа)',
     example: 'avatar',
