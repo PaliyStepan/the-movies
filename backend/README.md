@@ -1,132 +1,95 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# TheMovies — Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+NestJS 12 API with Prisma 7, PostgreSQL 16, JWT auth, and TMDB poster proxy.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Stack
 
-## Description
+- **NestJS 12** (ESM, `"type": "module"`)
+- **Prisma 7** (`prisma-client` generator, ESM output to `src/generated/prisma`)
+- **PostgreSQL 16** (Docker locally, Prisma Postgres in prod)
+- **Auth:** `@nestjs/jwt` + `passport-jwt`, argon2, httpOnly refresh cookie
+- **Docs:** Swagger at `/docs/v1`
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Environment
 
-## Project setup
+Copy `.env.example` to `.env` and fill in:
 
-```bash
-$ npm install
-```
+| Variable | Description |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `JWT_SECRET` | Secret for signing tokens (change in prod) |
+| `JWT_ACCESS_TOKEN_TTL` | Access token TTL (e.g. `15m`) |
+| `JWT_REFRESH_TOKEN_TTL` | Refresh token TTL (e.g. `7d`) |
+| `COOKIE_DOMAIN` | Cookie domain (prod only) |
+| `NODE_ENV` | `development` or `production` |
+| `PORT` | Server port (default 3000) |
+| `FRONTEND_URL` | Allowed CORS origin(s), comma-separated |
 
-## Compile and run the project
+## Run locally
 
-```bash
-# development
-$ npm run start
+### 1. Start Postgres
 
-# watch mode
-$ npm run start:dev
+    docker run --name movie-db -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=movieapp -p 5432:5432 -d postgres:17
 
-# production mode
-$ npm run start:prod
-```
+### 2. Install & migrate
 
-## Run tests
+    npm install
+    npx prisma migrate dev
+    npx prisma generate
 
-```bash
-# unit tests
-$ npm run test
+### 3. Dev server
 
-# e2e tests
-$ npm run test:e2e
+    npm run start:dev
 
-# test coverage
-$ npm run test:cov
-```
+Swagger: http://localhost:3000/docs/v1
 
-## Deployment
+## Import movies (TMDB dataset)
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+1. Download the dataset from Kaggle and put the CSV at `prisma/data/tmdb_movies.csv`.
+2. Run:
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+       npx tsx prisma/import-movies.ts
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+Imports ~10k movies with posters, descriptions, ratings, and genre IDs. Skips rows without poster or overview.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## API
 
-## Observability
+All routes are versioned under `/v1`.
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+### Auth
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
+| Method | Path | Description |
+|---|---|---|
+| POST | `/v1/auth/register` | Create account |
+| POST | `/v1/auth/login` | Login (sets refresh cookie) |
+| POST | `/v1/auth/refresh` | Rotate access token via cookie |
+| POST | `/v1/auth/logout` | Clear refresh cookie |
+| GET | `/v1/auth/@me` | Current user (auth required) |
 
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
+### Movies
 
-To add it to this project, run this and approve the code it prints at [observe.nestjs.com/link](https://observe.nestjs.com/link) - signing up for free if you have no account:
+| Method | Path | Description |
+|---|---|---|
+| GET | `/v1/movies?search=&page=&limit=&sort=&order=` | Search (min. 3 chars), paginated |
+| GET | `/v1/movies/:id` | Movie by ID |
+| POST | `/v1/movies` | Create (auth) |
+| PATCH | `/v1/movies/:id` | Update (author only) |
+| DELETE | `/v1/movies/:id` | Delete (author only) |
 
-```bash
-$ npx @nestjs/observe link
-```
+### Poster proxy
 
-It installs `@nestjs/observe`, wires it into `AppModule` and `main.ts`, and writes the app key and secret into `.env`, which every `nest start` script (`start`, `start:dev`, `start:debug`) then loads. In production, set `OBSERVE_APP_KEY` and `OBSERVE_APP_SECRET` in the environment instead.
+| Method | Path | Description |
+|---|---|---|
+| GET | `/v1/poster?path=/xxx.jpg` | Proxies TMDB images (bypasses regional blocks) |
 
-Or do it by hand:
+## Scripts
 
-```bash
-$ npm install @nestjs/observe
-```
-
-Then follow the [setup guide](https://docs.nestjs.com/observability/sdk) - it takes a single import and an app key.
-
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+| Command | Description |
+|---|---|
+| `npm run start:dev` | Dev server with watch |
+| `npm run build` | Compile to `dist/` |
+| `npm run start:prod` | Run compiled build |
+| `npx prisma migrate dev` | Create & apply migration |
+| `npx prisma migrate deploy` | Apply migrations (prod) |
+| `npx prisma generate` | Regenerate Prisma Client |
+| `npx prisma studio` | Open Prisma Studio |

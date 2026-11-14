@@ -1,75 +1,59 @@
-# React + TypeScript + Vite
+# TheMovies — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React SPA for browsing movies, with search, pagination, and auth. Built with Vite, Mantine, TanStack Query, Zustand, and Feature-Sliced Design.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 19** + **Vite**
+- **Mantine** (UI components + notifications)
+- **TanStack Query** (server state)
+- **Zustand** (auth state: access token + user, in memory only)
+- **React Router** (routing)
+- **React Hook Form + Zod** (forms & validation)
+- **Feature-Sliced Design** (app / pages / widgets / entities / features / shared)
 
-## React Compiler
+## Environment
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Copy `.env.example` to `.env`:
 
-## Expanding the ESLint configuration
+| Variable | Description |
+|---|---|
+| `VITE_API_URL` | Backend base URL, **including** `/v1` (e.g. `http://localhost:3000/v1`) |
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Run locally
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+    npm install
+    npm run dev
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+App: http://localhost:5173
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Backend must be running (see `../backend/README.md`).
 
-```
+## Structure (FSD)
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+    src/
+    ├── app/          # providers, router, App.tsx, main.tsx
+    ├── pages/        # login, register, movies-list, movie-detail
+    ├── widgets/      # header
+    ├── features/     # auth (useLogin, useRegister, useLogout)
+    ├── entities/     # movie (MovieCard, useMovies, api)
+    └── shared/       # api client, auth store, config, lib, ui
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+**Import rule:** a layer can only import from layers *below* it.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Auth flow
 
-```
+1. `POST /auth/login` → `accessToken` + httpOnly `refreshToken` cookie
+2. Access token stored **in Zustand memory** (never in `localStorage`)
+3. On 401 → axios interceptor calls `POST /auth/refresh` and retries
+4. On app start → `AuthInitializer` calls `refresh` → `getMe` → restores session
+5. On logout → `POST /auth/logout`, clear Zustand + TanStack cache
+
+## Scripts
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Dev server (5173) |
+| `npm run build` | Production build to `dist/` |
+| `npm run preview` | Preview production build |
+| `npm run lint` | ESLint |
