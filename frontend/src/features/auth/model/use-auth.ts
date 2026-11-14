@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/shared/auth/auth.store';
+import { ERoutes } from '@/shared/config/routes';
+import { notifications } from '@mantine/notifications';
 import {
   login as loginApi,
   register as registerApi,
@@ -24,7 +26,12 @@ export function useLogin() {
     onSuccess: ({ accessToken, user }) => {
       login(accessToken, user);
       queryClient.invalidateQueries();
-      navigate('/');
+      notifications.show({
+        title: 'Добро пожаловать!',
+        message: `Вы вошли как ${user.name}`,
+        color: 'green',
+      });
+      navigate(ERoutes.HOME);
     },
   });
 }
@@ -44,7 +51,12 @@ export function useRegister() {
       const user = await getMe();
       login(accessToken, user);
       queryClient.invalidateQueries();
-      navigate('/');
+      notifications.show({
+        title: 'Аккаунт создан',
+        message: 'Регистрация прошла успешно. Добро пожаловать!',
+        color: 'green',
+      });
+      navigate(ERoutes.HOME);
     },
   });
 }
@@ -59,7 +71,12 @@ export function useLogout() {
     onSuccess: () => {
       logout();
       queryClient.clear();
-      navigate('/login');
+      notifications.show({
+        title: 'Вы вышли',
+        message: 'До новых встреч!',
+        color: 'blue',
+      });
+      navigate(ERoutes.LOGIN);
     },
   });
 }
