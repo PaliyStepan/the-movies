@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Card, Image, Text, Badge, Group } from '@mantine/core';
 import type { IMovie } from '@the-movies/shared';
-import { getPosterUrl } from '@the-movies/shared';
 import { movieDetailPath } from '@/shared/config/routes';
+import {getPosterUrl} from "@/entities/movie/lib/poster.ts";
 
 export function MovieCard({ movie }: { movie: IMovie }) {
   const poster = getPosterUrl(movie);

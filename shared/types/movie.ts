@@ -33,11 +33,3 @@ export interface IPaginated<T> {
   limit: number;
   totalPages: number;
 }
-
-export function getPosterUrl(movie: Pick<IMovie, 'posterPath'>): string | null {
-  return movie.posterPath ? `${TMDB_POSTER_BASE}${movie.posterPath}` : null;
-}
-
-export function getBackdropUrl(movie: Pick<IMovie, 'backdropPath'>): string | null {
-  return movie.backdropPath ? `${TMDB_BACKDROP_BASE}${movie.backdropPath}` : null;
-}
