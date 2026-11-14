@@ -1,9 +1,8 @@
+import { RouterProvider } from 'react-router-dom';
+import { router } from './router/router';
+
 function App() {
-  return (
-    <div className="flex min-h-svh items-center justify-center">
-      asdas
-    </div>
-  )
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;
