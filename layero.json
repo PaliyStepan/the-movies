@@ -1,0 +1,6 @@
+{
+  "$schema": "https://layero.ru/schema/layero-v2.json",
+  "framework": "generic",
+  "buildCommand": "npm --prefix frontend ci --include=dev && npm --prefix frontend run build",
+  "outputDirectory": "frontend/dist"
+}
