@@ -1,0 +1,7 @@
+{
+  "backend": {
+    "root": "backend",
+    "build": "npm install && npx prisma generate && npm run build",
+    "start": "npm run start:prod"
+  }
+}
