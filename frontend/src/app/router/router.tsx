@@ -1,7 +1,7 @@
 import {createBrowserRouter} from 'react-router-dom';
 import {ERoutes} from '@/shared/config/routes';
 import {LoginPage} from '@/pages/login';
-import {RootLayout} from './RootLayout';
+import {RootError, RootLayout} from './RootLayout';
 import {PublicOnlyRoute} from './PublicOnlyRoute';
 import {RegisterPage} from "@/pages/register";
 import {MoviesListPage} from "@/pages/movies-list";
@@ -10,6 +10,7 @@ import {MovieDetailPage} from "@/pages/movie-detail";
 export const router = createBrowserRouter([
   {
     element: <RootLayout/>,
+    errorElement: <RootError/>,
     children: [
       {
         element: <PublicOnlyRoute/>,
