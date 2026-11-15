@@ -63,7 +63,7 @@ export function MoviesListPage() {
       <Title order={2}>Фильмы</Title>
 
       <TextInput
-        placeholder="Поиск фильмов (мин. 3 символа)"
+        placeholder="Поиск фильмов (пример Batman)"
         value={input}
         onChange={(e) => handleSearchChange(e.currentTarget.value)}
         disabled={isFetching}

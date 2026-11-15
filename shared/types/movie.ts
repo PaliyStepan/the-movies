@@ -33,3 +33,15 @@ export interface IPaginated<T> {
   limit: number;
   totalPages: number;
 }
+
+export interface ICreateMoviePayload {
+  title: string;
+  year?: number;
+  description?: string;
+  originalTitle?: string;
+  originalLanguage?: string;
+  posterPath?: string;
+  tmdbRating?: number;
+  voteCount?: number;
+  genreIds?: number[];
+}

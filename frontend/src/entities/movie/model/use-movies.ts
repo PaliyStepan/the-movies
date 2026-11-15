@@ -9,3 +9,4 @@ export function useMovies(query: IMovieListQuery) {
     enabled: (query.search?.trim().length ?? 0) >= 3,
   });
 }
+

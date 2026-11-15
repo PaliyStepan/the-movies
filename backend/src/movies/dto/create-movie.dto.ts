@@ -5,6 +5,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUrl,
   Length,
   Max,
   Min,
@@ -40,15 +41,13 @@ export class CreateMovieDto {
   @Length(2, 10)
   originalLanguage?: string;
 
-  @ApiPropertyOptional({ example: '/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg' })
+  @ApiPropertyOptional({
+    example: 'https://example.com/poster.jpg',
+    description: 'Полный внешний URL постера (http/https)',
+  })
   @IsOptional()
-  @IsString()
+  @IsUrl({ protocols: ['http', 'https'], require_protocol: true })
   posterPath?: string;
-
-  @ApiPropertyOptional({ example: '/zfbjgQE1uSd9wiPTX4VzsLi0rGG.jpg' })
-  @IsOptional()
-  @IsString()
-  backdropPath?: string;
 
   @ApiPropertyOptional({ example: 8.7 })
   @IsOptional()

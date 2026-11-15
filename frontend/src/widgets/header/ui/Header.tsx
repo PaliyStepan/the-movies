@@ -19,13 +19,14 @@ export function Header() {
 
           <Group gap="sm">
             {!isInitialized ? null : user ? (
-              <Button
-                variant="outline"
-                onClick={() => logoutMutation.mutate()}
-                loading={logoutMutation.isPending}
-              >
-                Выйти
-              </Button>
+              <>
+                <Button component={Link} to={ERoutes.MOVIE_CREATE} variant="light">
+                  Создать фильм
+                </Button>
+                <Button variant="outline" onClick={() => logoutMutation.mutate()} loading={logoutMutation.isPending}>
+                  Выйти
+                </Button>
+              </>
             ) : (
               <>
                 <Button component={Link} to={ERoutes.LOGIN} variant="subtle">

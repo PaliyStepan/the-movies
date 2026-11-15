@@ -34,6 +34,7 @@ export class MoviesService {
     const where: Prisma.MovieWhereInput = {
       OR: [
         { title: { contains: search, mode: 'insensitive' } },
+        { originalTitle: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } },
       ],
     };
@@ -72,7 +73,6 @@ export class MoviesService {
         year: dto.year ?? null,
         description: dto.description ?? null,
         posterPath: dto.posterPath ?? null,
-        backdropPath: dto.backdropPath ?? null,
         tmdbRating: dto.tmdbRating ?? null,
         voteCount: dto.voteCount ?? null,
         genreIds: dto.genreIds ?? [],
@@ -129,7 +129,6 @@ export class MoviesService {
         year: dto.year,
         description: dto.description,
         posterPath: dto.posterPath,
-        backdropPath: dto.backdropPath,
         tmdbRating: dto.tmdbRating,
         voteCount: dto.voteCount,
         genreIds: dto.genreIds,
