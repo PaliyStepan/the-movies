@@ -1,13 +1,17 @@
-import type { IMovie } from '@the-movies/shared';
+import type {IMovie} from '@the-movies/shared';
 
-const API_BASE = import.meta.env.VITE_API_URL;
+const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/w500';
 
 export function getPosterUrl(movie: Pick<IMovie, 'posterPath'>): string | null {
   if (!movie.posterPath) return null;
-  return `${API_BASE}/poster?path=${encodeURIComponent(movie.posterPath)}`;
+
+  const originalUrl = `${TMDB_IMAGE_BASE}${movie.posterPath}`;
+  return `https://wsrv.nl/?url=${encodeURIComponent(originalUrl)}`;
 }
 
 export function getBackdropUrl(movie: Pick<IMovie, 'backdropPath'>): string | null {
   if (!movie.backdropPath) return null;
-  return `${API_BASE}/poster?path=${encodeURIComponent(movie.backdropPath)}`;
+
+  const originalUrl = `${TMDB_IMAGE_BASE}${movie.backdropPath}`;
+  return `https://wsrv.nl/?url=${encodeURIComponent(originalUrl)}`;
 }
