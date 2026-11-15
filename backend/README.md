@@ -20,7 +20,6 @@ Copy `.env.example` to `.env` and fill in:
 | `JWT_SECRET` | Secret for signing tokens (change in prod) |
 | `JWT_ACCESS_TOKEN_TTL` | Access token TTL (e.g. `15m`) |
 | `JWT_REFRESH_TOKEN_TTL` | Refresh token TTL (e.g. `7d`) |
-| `COOKIE_DOMAIN` | Cookie domain (prod only) |
 | `NODE_ENV` | `development` or `production` |
 | `PORT` | Server port (default 3000) |
 | `FRONTEND_URL` | Allowed CORS origin(s), comma-separated |

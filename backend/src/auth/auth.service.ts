@@ -14,7 +14,6 @@ import type { IJwtPayload } from '@the-movies/shared';
 export class AuthService {
   private readonly JWT_ACCESS_TOKEN_TTL: string;
   private readonly JWT_REFRESH_TOKEN_TTL: string;
-  private readonly COOKIE_DOMAIN: string;
 
   constructor(
     private readonly prismaService: PrismaService,
@@ -27,7 +26,6 @@ export class AuthService {
     this.JWT_REFRESH_TOKEN_TTL = configService.getOrThrow<string>(
       'JWT_REFRESH_TOKEN_TTL',
     );
-    this.COOKIE_DOMAIN = configService.getOrThrow<string>('COOKIE_DOMAIN');
   }
 
   private auth(res: Response, id: string) {
@@ -96,7 +94,6 @@ export class AuthService {
       httpOnly: true,
       secure: !isDev(this.configService),
       sameSite: isDev(this.configService) ? 'lax' : 'none',
-      ...(isDev(this.configService) ? {} : { domain: this.COOKIE_DOMAIN }),
     });
   }
 
