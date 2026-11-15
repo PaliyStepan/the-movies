@@ -10,16 +10,18 @@ import {
   Center,
   Alert,
   Anchor,
-  Divider,
+  Divider, Button,
 } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { getMovieById } from '@/entities/movie';
 import { getPosterUrl } from '@/entities/movie/lib/poster';
-import { ERoutes } from '@/shared/config/routes';
+import {ERoutes, movieEditPath} from '@/shared/config/routes';
 import { GENRE_NAMES } from '@/entities/movie/lib/genres';
+import {useAuthStore} from "@/shared/auth/auth.store.ts";
 
 export function MovieDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const user = useAuthStore((s) => s.user);
 
   const { data: movie, isPending, isError } = useQuery({
     queryKey: ['movie', id],
@@ -90,6 +92,12 @@ export function MovieDetailPage() {
           <Badge variant="outline">{movie.originalLanguage.toUpperCase()}</Badge>
         )}
       </Group>
+
+      {user && movie.createdById === user.id && (
+        <Button component={Link} to={movieEditPath(movie.id)} variant="light">
+          Редактировать
+        </Button>
+      )}
 
       <Divider my="md" />
 

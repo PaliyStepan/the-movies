@@ -95,6 +95,7 @@ export class MoviesService {
     tmdbRating: number | null;
     voteCount: number | null;
     genreIds: number[];
+    createdById: string | null;
     createdAt: Date;
     updatedAt: Date;
   }): IMovie {

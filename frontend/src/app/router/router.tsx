@@ -8,6 +8,7 @@ import {MoviesListPage} from "@/pages/movies-list";
 import {MovieDetailPage} from "@/pages/movie-detail";
 import {ProtectedRoute} from "./ProtectedRoute";
 import {MovieCreatePage} from "@/pages/movie-create";
+import {MovieEditPage} from "@/pages/move-edit";
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,7 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute />,
         children: [
           { path: ERoutes.MOVIE_CREATE, element: <MovieCreatePage /> },
+          { path: ERoutes.MOVIE_EDIT, element: <MovieEditPage /> },
         ],
       },
       { path: ERoutes.HOME, element: <MoviesListPage /> },

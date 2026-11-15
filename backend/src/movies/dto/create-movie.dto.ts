@@ -24,9 +24,10 @@ export class CreateMovieDto {
   @Max(new Date().getFullYear() + 5)
   year?: number;
 
-  @ApiPropertyOptional({ example: 'In the 22nd century...' })
+  @ApiPropertyOptional({ example: 'In the 22nd century...', maxLength: 3000 })
   @IsOptional()
   @IsString()
+  @Length(0, 3000, { message: 'Описание не должно превышать 5000 символов' })
   description?: string;
 
   @ApiPropertyOptional({ example: 'Avatar' })

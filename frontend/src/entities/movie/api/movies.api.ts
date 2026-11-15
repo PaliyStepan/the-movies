@@ -24,3 +24,8 @@ export async function createMovie(payload: ICreateMoviePayload): Promise<IMovie>
   const {data} = await api.post<IMovie>('/movies', payload);
   return data;
 }
+
+export async function updateMovie(id: string, payload: Partial<ICreateMoviePayload>): Promise<IMovie> {
+  const { data } = await api.patch<IMovie>(`/movies/${id}`, payload);
+  return data;
+}

@@ -28,7 +28,10 @@ const createMovieSchema = z.object({
     .min(1888, 'Минимум 1888')
     .max(currentYear + 5, `Максимум ${currentYear + 5}`)
     .optional(),
-  description: z.string().optional(),
+  description: z
+    .string()
+    .max(3000, 'Максимум 3000 символов')
+    .optional(),
   originalTitle: z.string().max(200, 'Максимум 200 символов').optional(),
   originalLanguage: z
     .string()
@@ -105,6 +108,7 @@ export function MovieCreatePage() {
             label="Название"
             placeholder="Например, Интерстеллар"
             error={errors.title?.message}
+            maxLength={200}
             withAsterisk
             {...register('title')}
           />
@@ -131,7 +135,7 @@ export function MovieCreatePage() {
           <Textarea
             label="Описание"
             placeholder="Краткое описание фильма"
-            minRows={3}
+            maxLength={3000}
             error={errors.description?.message}
             {...register('description')}
           />
@@ -139,12 +143,14 @@ export function MovieCreatePage() {
           <TextInput
             label="Оригинальное название"
             placeholder="Interstellar"
+            maxLength={200}
             error={errors.originalTitle?.message}
             {...register('originalTitle')}
           />
 
           <TextInput
             label="Язык оригинала"
+            maxLength={3}
             placeholder="en"
             error={errors.originalLanguage?.message}
             {...register('originalLanguage')}
