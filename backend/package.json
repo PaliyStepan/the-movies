@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "type": "module",
   "scripts": {
-    "build": "prisma generate && DATABASE_URL=$DIRECT_URL prisma migrate deploy && nest build",
+    "build": "prisma generate && PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1 DATABASE_URL=$DIRECT_URL prisma migrate deploy && nest build",
     "deploy": "nest deploy",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
