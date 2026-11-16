@@ -22,6 +22,7 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   movies    Movie[]
+  reviews   Review[]
 
   @@map("users")
 }
@@ -43,6 +44,22 @@ model Movie {
   updatedAt        DateTime @updatedAt @map("updated_at")
   createdById      String?  @map("created_by_id")
   createdBy        User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  reviews          Review[]
 
   @@map("movies")
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  title       String?
+  description String
+  userId      String   @map("user_id")
+  movieId     String   @map("movie_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie       Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
+  @@map("reviews")
 }

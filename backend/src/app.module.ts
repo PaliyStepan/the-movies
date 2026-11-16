@@ -5,6 +5,7 @@ import { AppService } from './app.service.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { MoviesModule } from './movies/movies.module.js';
+import { ReviewsModule } from './reviews/reviews.module';
 
 
 @Module({
@@ -13,6 +14,7 @@ import { MoviesModule } from './movies/movies.module.js';
     PrismaModule,
     AuthModule,
     MoviesModule,
+    ReviewsModule
   ],
   controllers: [AppController],
   providers: [AppService],
