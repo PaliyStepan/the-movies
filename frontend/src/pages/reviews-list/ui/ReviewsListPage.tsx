@@ -1,5 +1,5 @@
-import {Link, useParams} from 'react-router-dom';
-import {useQuery} from '@tanstack/react-query';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import {
   Anchor,
   Button,
@@ -7,35 +7,47 @@ import {
   Center,
   Group,
   Loader,
+  Pagination,
   Stack,
   Text,
   Title,
 } from '@mantine/core';
-import {useAuthStore} from '@/shared/auth/auth.store';
-import {getMovieById} from '@/entities/movie/api/movies.api';
-import {useReviews} from '@/entities/review/model/use-reviews';
+import { useAuthStore } from '@/shared/auth/auth.store';
+import { getMovieById } from '@/entities/movie/api/movies.api';
+import { useReviews } from '@/entities/review/model/use-reviews';
 import {
   movieDetailPath,
   reviewCreatePath,
   reviewDetailPath,
 } from '@/shared/config/routes';
 
-export function ReviewsListPage() {
-  const {movieId} = useParams<{ movieId: string }>();
-  const user = useAuthStore((s) => s.user);
+const LIMIT = 10;
 
-  const {data: movie} = useQuery({
+export function ReviewsListPage() {
+  const { movieId } = useParams<{ movieId: string }>();
+  const user = useAuthStore((s) => s.user);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const page = Number(searchParams.get('page') ?? '1');
+
+  const { data: movie } = useQuery({
     queryKey: ['movie', movieId],
-    queryFn: ({signal}) => getMovieById(movieId!, signal),
+    queryFn: ({ signal }) => getMovieById(movieId!, signal),
     enabled: !!movieId,
   });
 
-  const {data: reviews, isPending} = useReviews(movieId!);
+  const { data, isPending } = useReviews(movieId!, { page, limit: LIMIT });
+
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('page', String(newPage));
+    setSearchParams(params);
+  };
 
   if (isPending) {
     return (
       <Center py="xl">
-        <Loader/>
+        <Loader />
       </Center>
     );
   }
@@ -57,22 +69,18 @@ export function ReviewsListPage() {
         )}
       </Group>
 
-      {!reviews || reviews.length === 0 ? (
-        <Text c="dimmed">
-          {user
-            ? 'Пока нет отзывов. Будьте первым!'
-            : 'Пока нет отзывов. Зарегистрируйтесь или войдите, чтобы оставить первый отзыв.'}
-        </Text>
+      {!data || data.items.length === 0 ? (
+        <Text c="dimmed">Пока нет отзывов. Будьте первым!</Text>
       ) : (
         <Stack gap="sm">
-          {reviews.map((review) => (
+          {data.items.map((review) => (
             <Card
               key={review.id}
               component={Link}
               to={reviewDetailPath(review.id)}
               withBorder
               padding="md"
-              style={{textDecoration: 'none'}}
+              style={{ textDecoration: 'none' }}
             >
               <Stack gap="xs">
                 {review.title && (
@@ -93,6 +101,16 @@ export function ReviewsListPage() {
             </Card>
           ))}
         </Stack>
+      )}
+
+      {data && data.totalPages > 1 && (
+        <Group justify="center">
+          <Pagination
+            value={page}
+            onChange={handlePageChange}
+            total={data.totalPages}
+          />
+        </Group>
       )}
     </Stack>
   );

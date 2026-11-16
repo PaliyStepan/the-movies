@@ -1,15 +1,19 @@
 import type {
   IReview,
   ICreateReviewPayload,
-  IUpdateReviewPayload,
+  IUpdateReviewPayload, IPaginated,
 } from '@the-movies/shared';
 import { api } from '@/shared/api/client';
 
 export async function getReviewsByMovie(
   movieId: string,
+  params: { page?: number; limit?: number },
   signal?: AbortSignal,
-): Promise<IReview[]> {
-  const { data } = await api.get<IReview[]>(`/movies/${movieId}/reviews`, { signal });
+): Promise<IPaginated<IReview>> {
+  const { data } = await api.get<IPaginated<IReview>>(
+    `/movies/${movieId}/reviews`,
+    { params, signal },
+  );
   return data;
 }
 

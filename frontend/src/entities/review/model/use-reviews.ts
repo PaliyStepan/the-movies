@@ -1,10 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { getReviewsByMovie, getReviewById } from '../api/reviews.api';
 
-export function useReviews(movieId: string) {
+export function useReviews(
+  movieId: string,
+  params: { page?: number; limit?: number } = {},
+) {
   return useQuery({
-    queryKey: ['reviews', movieId],
-    queryFn: ({ signal }) => getReviewsByMovie(movieId, signal),
+    queryKey: ['reviews', movieId, params],
+    queryFn: ({ signal }) => getReviewsByMovie(movieId, params, signal),
     enabled: !!movieId,
   });
 }

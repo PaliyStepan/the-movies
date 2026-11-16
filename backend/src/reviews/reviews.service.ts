@@ -5,37 +5,55 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import type { IReview } from '@the-movies/shared';
+import { IPaginatedReviews, IReview } from '@the-movies/shared';
 import { CreateReviewDto } from './dto/create-review.dto.js';
 import { UpdateReviewDto } from './dto/update-review.dto.js';
+import { ReviewListQueryDto } from './dto/review-list-query.dto.js';
 
 @Injectable()
 export class ReviewsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findByMovie(movieId: string): Promise<IReview[]> {
+  async findByMovie(
+    movieId: string,
+    query: ReviewListQueryDto,
+  ): Promise<IPaginatedReviews> {
     const movie = await this.prisma.movie.findUnique({
       where: { id: movieId },
     });
     if (!movie) throw new NotFoundException('Фильм не найден');
 
-    const reviews = await this.prisma.review.findMany({
-      where: { movieId },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            createdAt: true,
-            updatedAt: true,
+    const page = Math.max(1, query.page ?? 1);
+    const limit = Math.min(100, Math.max(1, query.limit ?? 10));
+
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.review.findMany({
+        where: { movieId },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              createdAt: true,
+              updatedAt: true,
+            },
           },
         },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.review.count({ where: { movieId } }),
+    ]);
 
-    return reviews.map((r) => this.toResponse(r));
+    return {
+      items: items.map((r) => this.toResponse(r)),
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async findOne(id: string): Promise<IReview> {

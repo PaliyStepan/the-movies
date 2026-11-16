@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -23,6 +24,7 @@ import { CreateReviewDto } from './dto/create-review.dto.js';
 import { UpdateReviewDto } from './dto/update-review.dto.js';
 import { Authorization } from '../auth/decorators/authorization.decorator.js';
 import { Authorized } from '../auth/decorators/authorized.decorator.js';
+import { ReviewListQueryDto } from './dto/review-list-query.dto.js';
 
 @ApiTags('reviews')
 @Controller({ version: '1' })
@@ -30,11 +32,14 @@ export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 
   @Get('movies/:movieId/reviews')
-  @ApiOperation({ summary: 'Отзывы фильма' })
+  @ApiOperation({ summary: 'Отзывы фильма (пагинированные)' })
   @ApiParam({ name: 'movieId', description: 'UUID фильма' })
-  @ApiOkResponse({ description: 'Список отзывов' })
-  findByMovie(@Param('movieId') movieId: string) {
-    return this.reviewsService.findByMovie(movieId);
+  @ApiOkResponse({ description: 'Пагинированный список отзывов' })
+  findByMovie(
+    @Param('movieId') movieId: string,
+    @Query() query: ReviewListQueryDto,
+  ) {
+    return this.reviewsService.findByMovie(movieId, query);
   }
 
   @Authorization()

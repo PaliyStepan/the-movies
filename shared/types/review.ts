@@ -1,4 +1,5 @@
 import {IUserPublic} from "./user";
+import {IPaginated} from "./movie";
 
 export interface IReview {
   id: string;
@@ -20,3 +21,5 @@ export interface IUpdateReviewPayload {
   title?: string;
   description?: string;
 }
+
+export type IPaginatedReviews = IPaginated<IReview>;
