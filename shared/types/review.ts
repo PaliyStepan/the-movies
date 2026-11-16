@@ -1,5 +1,5 @@
-import {IUserPublic} from "./user";
-import {IPaginated} from "./movie";
+import type {IUserPublic} from "./user";
+import type {IPaginated} from "./movie";
 
 export interface IReview {
   id: string;
