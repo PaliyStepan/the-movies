@@ -42,6 +42,15 @@ export class MoviesController {
     return this.moviesService.findAll(query);
   }
 
+  @Authorization()
+  @ApiBearerAuth()
+  @Get('me')
+  @ApiOperation({ summary: 'Мои созданные фильмы (пагинированные)' })
+  @ApiOkResponse({ description: 'Пагинированный список моих фильмов' })
+  findMy(@Query() query: IMovieListQueryDto, @Authorized('id') userId: string) {
+    return this.moviesService.findByUser(userId, query);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Фильм по id' })
   @ApiParam({ name: 'id', description: 'UUID фильма' })

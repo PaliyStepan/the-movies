@@ -8,7 +8,9 @@ import { SignOptions } from 'jsonwebtoken';
 import { LoginRequest } from './dto/login.dto.js';
 import { Response, Request } from 'express';
 import { isDev } from '../utils/is-dev.util.js';
-import type { IJwtPayload } from '@the-movies/shared';
+import type { IJwtPayload, IUserPublic } from '@the-movies/shared';
+import { UpdateProfileDto } from './dto/update-profile.dto.js';
+import { ChangePasswordDto } from './dto/change-password.dto.js';
 
 @Injectable()
 export class AuthService {
@@ -126,13 +128,12 @@ export class AuthService {
 
   async validate(id: string) {
     const user = await this.prismaService.user.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
       select: {
         id: true,
         email: true,
         name: true,
+        lastName: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -142,7 +143,11 @@ export class AuthService {
       throw new UnauthorizedException('Пользователь не найден');
     }
 
-    return user;
+    return {
+      ...user,
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString(),
+    };
   }
 
   private generateTokens(id: string) {
@@ -168,6 +173,54 @@ export class AuthService {
       expires,
       secure: !isDev(this.configService),
       sameSite: isDev(this.configService) ? 'lax' : 'none',
+    });
+  }
+
+  async updateProfile(
+    userId: string,
+    dto: UpdateProfileDto,
+  ): Promise<IUserPublic> {
+    const user = await this.prismaService.user.update({
+      where: { id: userId },
+      data: {
+        name: dto.name,
+        lastName: dto.lastName,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        lastName: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    return {
+      ...user,
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString(),
+    };
+  }
+
+  async changePassword(userId: string, dto: ChangePasswordDto): Promise<void> {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+      select: { password: true },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Пользователь не найден');
+    }
+
+    const isValid = await verify(user.password, dto.currentPassword);
+    if (!isValid) {
+      throw new UnauthorizedException('Неверный текущий пароль');
+    }
+
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: { password: await hash(dto.newPassword) },
     });
   }
 }

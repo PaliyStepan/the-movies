@@ -8,6 +8,7 @@ import type { IMovieListQuery, IPaginated, IMovie } from '@the-movies/shared';
 import type { Prisma } from '../generated/prisma/client.js';
 import { CreateMovieDto } from './dto/create-movie.dto.js';
 import { UpdateMovieDto } from './dto/update-movie.dto.js';
+import { IMovieListQueryDto } from './dto/movie-list-query.dto.js';
 
 @Injectable()
 export class MoviesService {
@@ -151,5 +152,35 @@ export class MoviesService {
     }
 
     await this.prisma.movie.delete({ where: { id } });
+  }
+
+  async findByUser(
+    userId: string,
+    query: IMovieListQueryDto,
+  ): Promise<IPaginated<IMovie>> {
+    const page = Math.max(1, query.page ?? 1);
+    const limit = Math.min(100, Math.max(1, query.limit ?? 20));
+    const sort = query.sort ?? 'createdAt';
+    const order = query.order ?? 'desc';
+
+    const where: Prisma.MovieWhereInput = { createdById: userId };
+
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.movie.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { [sort]: order },
+      }),
+      this.prisma.movie.count({ where }),
+    ]);
+
+    return {
+      items: items.map((m) => this.toResponse(m)),
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 }

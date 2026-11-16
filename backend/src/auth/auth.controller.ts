@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Post,
   Get,
+  Patch,
 } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { RegisterRequest } from './dto/register.dto.js';
@@ -17,6 +18,7 @@ import {
   ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiUnauthorizedResponse,
@@ -25,6 +27,8 @@ import { AuthResponse } from './dto/auth.dto.js';
 import { Authorization } from './decorators/authorization.decorator.js';
 import { Authorized } from './decorators/authorized.decorator.js';
 import type { User } from '../generated/prisma/client';
+import { UpdateProfileDto } from './dto/update-profile.dto.js';
+import { ChangePasswordDto } from './dto/change-password.dto.js';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
@@ -108,5 +112,30 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async me(@Authorized() user: User) {
     return user;
+  }
+
+  @Authorization()
+  @ApiBearerAuth()
+  @Patch('profile')
+  @ApiOperation({ summary: 'Обновить профиль (имя, фамилия)' })
+  @ApiOkResponse({ description: 'Обновлённый пользователь' })
+  updateProfile(
+    @Body() dto: UpdateProfileDto,
+    @Authorized('id') userId: string,
+  ) {
+    return this.authService.updateProfile(userId, dto);
+  }
+
+  @Authorization()
+  @ApiBearerAuth()
+  @Patch('password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Сменить пароль' })
+  @ApiNoContentResponse({ description: 'Пароль изменён' })
+  changePassword(
+    @Body() dto: ChangePasswordDto,
+    @Authorized('id') userId: string,
+  ) {
+    return this.authService.changePassword(userId, dto);
   }
 }

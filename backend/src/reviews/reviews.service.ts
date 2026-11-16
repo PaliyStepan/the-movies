@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { IPaginatedReviews, IReview } from '@the-movies/shared';
+import type { IPaginatedReviews, IReview } from '@the-movies/shared';
 import { CreateReviewDto } from './dto/create-review.dto.js';
 import { UpdateReviewDto } from './dto/update-review.dto.js';
 import { ReviewListQueryDto } from './dto/review-list-query.dto.js';
@@ -35,6 +35,7 @@ export class ReviewsService {
               id: true,
               email: true,
               name: true,
+              lastName: true,
               createdAt: true,
               updatedAt: true,
             },
@@ -65,6 +66,7 @@ export class ReviewsService {
             id: true,
             email: true,
             name: true,
+            lastName: true,
             createdAt: true,
             updatedAt: true,
           },
@@ -105,6 +107,7 @@ export class ReviewsService {
             id: true,
             email: true,
             name: true,
+            lastName: true,
             createdAt: true,
             updatedAt: true,
           },
@@ -138,6 +141,7 @@ export class ReviewsService {
             id: true,
             email: true,
             name: true,
+            lastName: true,
             createdAt: true,
             updatedAt: true,
           },
@@ -168,6 +172,7 @@ export class ReviewsService {
       id: string;
       email: string;
       name: string;
+      lastName: string | null;
       createdAt: Date;
       updatedAt: Date;
     };
@@ -187,6 +192,44 @@ export class ReviewsService {
       },
       createdAt: review.createdAt.toISOString(),
       updatedAt: review.updatedAt.toISOString(),
+    };
+  }
+
+  async findByUser(
+    userId: string,
+    query: ReviewListQueryDto,
+  ): Promise<IPaginatedReviews> {
+    const page = Math.max(1, query.page ?? 1);
+    const limit = Math.min(100, Math.max(1, query.limit ?? 10));
+
+    const [items, total] = await this.prisma.$transaction([
+      this.prisma.review.findMany({
+        where: { userId },
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              lastName: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.review.count({ where: { userId } }),
+    ]);
+
+    return {
+      items: items.map((r) => this.toResponse(r)),
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
     };
   }
 }

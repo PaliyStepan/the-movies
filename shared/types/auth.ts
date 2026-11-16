@@ -14,3 +14,13 @@ export interface IRegisterPayload extends ILoginPayload {
 export interface IAuthResponse {
   accessToken: string;
 }
+
+export interface IUpdateProfilePayload {
+  name?: string;
+  lastName?: string;
+}
+
+export interface IChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+}

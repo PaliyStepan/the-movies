@@ -81,6 +81,15 @@ export class ReviewsController {
     return this.reviewsService.remove(id, userId);
   }
 
+  @Authorization()
+  @ApiBearerAuth()
+  @Get('reviews/me')
+  @ApiOperation({ summary: 'Мои отзывы (пагинированные)' })
+  @ApiOkResponse({ description: 'Пагинированный список моих отзывов' })
+  findMy(@Query() query: ReviewListQueryDto, @Authorized('id') userId: string) {
+    return this.reviewsService.findByUser(userId, query);
+  }
+
   @Get('reviews/:id')
   @ApiOperation({ summary: 'Отзыв по id' })
   @ApiParam({ name: 'id', description: 'UUID отзыва' })
