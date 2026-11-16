@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import {useParams, Link} from 'react-router-dom';
 import {
   Container,
   Title,
@@ -12,27 +12,28 @@ import {
   Anchor,
   Divider, Button,
 } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
-import { getMovieById } from '@/entities/movie';
-import { getPosterUrl } from '@/entities/movie/lib/poster';
+import {useQuery} from '@tanstack/react-query';
+import {getMovieById} from '@/entities/movie';
+import {getPosterUrl} from '@/entities/movie/lib/poster';
 import {ERoutes, movieEditPath} from '@/shared/config/routes';
-import { GENRE_NAMES } from '@/entities/movie/lib/genres';
+import {GENRE_NAMES} from '@/entities/movie/lib/genres';
 import {useAuthStore} from "@/shared/auth/auth.store.ts";
+import {reviewsListPath} from '@/shared/config/routes';
 
 export function MovieDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  const {id} = useParams<{ id: string }>();
   const user = useAuthStore((s) => s.user);
 
-  const { data: movie, isPending, isError } = useQuery({
+  const {data: movie, isPending, isError} = useQuery({
     queryKey: ['movie', id],
-    queryFn: ({ signal }) => getMovieById(id!, signal),
+    queryFn: ({signal}) => getMovieById(id!, signal),
     enabled: !!id,
   });
 
   if (isPending) {
     return (
       <Center py="xl">
-        <Loader />
+        <Loader/>
       </Center>
     );
   }
@@ -93,13 +94,19 @@ export function MovieDetailPage() {
         )}
       </Group>
 
-      {user && movie.createdById === user.id && (
-        <Button component={Link} to={movieEditPath(movie.id)} variant="light">
-          Редактировать
-        </Button>
-      )}
+      <Group gap="xs">
+        {user && movie.createdById === user.id && (
+          <Button component={Link} to={movieEditPath(movie.id)} variant="light">
+            Редактировать
+          </Button>
+        )}
 
-      <Divider my="md" />
+        <Button component={Link} to={reviewsListPath(movie.id)} variant="light">
+          Отзывы
+        </Button>
+      </Group>
+
+      <Divider my="md"/>
 
       {movie.description ? (
         <Text size="md">{movie.description}</Text>

@@ -2,9 +2,13 @@ export const ERoutes = {
   HOME: '/',
   LOGIN: '/login',
   REGISTER: '/register',
-  MOVIE_DETAIL: '/movies/:id',
   MOVIE_CREATE: '/movies/create',
   MOVIE_EDIT: '/movies/edit/:id',
+  MOVIE_DETAIL: '/movies/:id',
+  REVIEWS_LIST: '/movies/:movieId/reviews',
+  REVIEW_CREATE: '/movies/:movieId/reviews/create',
+  REVIEW_DETAIL: '/reviews/:id',
+  REVIEW_EDIT: '/reviews/:id/edit',
 } as const;
 
 export function movieDetailPath(id: string): string {
@@ -13,4 +17,20 @@ export function movieDetailPath(id: string): string {
 
 export function movieEditPath(id: string): string {
   return `/movies/edit/${id}`;
+}
+
+export function reviewsListPath(movieId: string): string {
+  return `/movies/${movieId}/reviews`;
+}
+
+export function reviewCreatePath(movieId: string): string {
+  return `/movies/${movieId}/reviews/create`;
+}
+
+export function reviewDetailPath(id: string): string {
+  return `/reviews/${id}`;
+}
+
+export function reviewEditPath(id: string): string {
+  return `/reviews/${id}/edit`;
 }

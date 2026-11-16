@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^7.0.6",
     "@mantine/core": "^9.8.0",
     "@mantine/hooks": "^9.8.0",
+    "@mantine/modals": "^9.8.0",
     "@mantine/notifications": "^9.8.0",
     "@tailwindcss/vite": "^4.3.5",
     "@tanstack/react-query": "^5.107.1",

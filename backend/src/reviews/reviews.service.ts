@@ -5,11 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import type {
-  IReview,
-  ICreateReviewPayload,
-  IUpdateReviewPayload,
-} from '@the-movies/shared';
+import type { IReview } from '@the-movies/shared';
 import { CreateReviewDto } from './dto/create-review.dto.js';
 import { UpdateReviewDto } from './dto/update-review.dto.js';
 
@@ -40,6 +36,25 @@ export class ReviewsService {
     });
 
     return reviews.map((r) => this.toResponse(r));
+  }
+
+  async findOne(id: string): Promise<IReview> {
+    const review = await this.prisma.review.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
+    });
+    if (!review) throw new NotFoundException('Отзыв не найден');
+    return this.toResponse(review);
   }
 
   async create(

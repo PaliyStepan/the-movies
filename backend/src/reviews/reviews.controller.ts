@@ -75,4 +75,12 @@ export class ReviewsController {
   remove(@Param('id') id: string, @Authorized('id') userId: string) {
     return this.reviewsService.remove(id, userId);
   }
+
+  @Get('reviews/:id')
+  @ApiOperation({ summary: 'Отзыв по id' })
+  @ApiParam({ name: 'id', description: 'UUID отзыва' })
+  @ApiOkResponse({ description: 'Найденный отзыв' })
+  findOne(@Param('id') id: string) {
+    return this.reviewsService.findOne(id);
+  }
 }
