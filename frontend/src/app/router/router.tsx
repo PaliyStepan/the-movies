@@ -13,6 +13,7 @@ import {ReviewsListPage} from '@/pages/reviews-list';
 import {ReviewDetailPage} from '@/pages/review-detail';
 import {ReviewCreatePage} from '@/pages/review-create';
 import {ReviewEditPage} from '@/pages/review-edit';
+import {LkLayout, LkInfoPage, LkReviewsPage, LkMoviesPage} from '@/pages/lk';
 
 export const router = createBrowserRouter([
   {
@@ -29,6 +30,15 @@ export const router = createBrowserRouter([
       {
         element: <ProtectedRoute/>,
         children: [
+          {
+            path: ERoutes.LK,
+            element: <LkLayout />,
+            children: [
+              { index: true, element: <LkInfoPage /> },
+              { path: 'reviews', element: <LkReviewsPage /> },
+              { path: 'movies', element: <LkMoviesPage /> },
+            ],
+          },
           {path: ERoutes.MOVIE_CREATE, element: <MovieCreatePage/>},
           {path: ERoutes.MOVIE_EDIT, element: <MovieEditPage/>},
           {path: ERoutes.REVIEW_CREATE, element: <ReviewCreatePage/>},

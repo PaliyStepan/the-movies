@@ -1,10 +1,10 @@
-import { Link } from 'react-router-dom';
-import { Card, Image, Text, Badge, Group } from '@mantine/core';
-import type { IMovie } from '@the-movies/shared';
-import { movieDetailPath } from '@/shared/config/routes';
+import {Link} from 'react-router-dom';
+import {Card, Image, Text, Badge, Group} from '@mantine/core';
+import type {IMovie} from '@the-movies/shared';
+import {movieDetailPath} from '@/shared/config/routes';
 import {getPosterUrl} from "@/entities/movie/lib/poster.ts";
 
-export function MovieCard({ movie }: { movie: IMovie }) {
+export function MovieCard({movie}: { movie: IMovie }) {
   const poster = getPosterUrl(movie);
 
   return (
@@ -14,7 +14,7 @@ export function MovieCard({ movie }: { movie: IMovie }) {
       padding="sm"
       radius="md"
       withBorder
-      style={{ textDecoration: 'none', height: '100%' }}
+      style={{textDecoration: 'none', height: '100%'}}
     >
       <Card.Section>
         <Image
@@ -22,6 +22,7 @@ export function MovieCard({ movie }: { movie: IMovie }) {
           alt={movie.title}
           height={300}
           fallbackSrc="no-photo.jpg"
+          style={{height: '300px'}}
         />
       </Card.Section>
 
@@ -30,7 +31,7 @@ export function MovieCard({ movie }: { movie: IMovie }) {
           {movie.title}
         </Text>
         {movie.year && (
-          <Badge variant="light" style={{ flexShrink: 0 }}>
+          <Badge variant="light" style={{flexShrink: 0}}>
             {movie.year}
           </Badge>
         )}

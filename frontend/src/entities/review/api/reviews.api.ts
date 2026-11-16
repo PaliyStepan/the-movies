@@ -44,3 +44,11 @@ export async function updateReview(
 export async function deleteReview(id: string): Promise<void> {
   await api.delete(`/reviews/${id}`);
 }
+
+export async function getMyReviews(
+  params: { page?: number; limit?: number },
+  signal?: AbortSignal,
+): Promise<IPaginated<IReview>> {
+  const { data } = await api.get<IPaginated<IReview>>('/reviews/me', { params, signal });
+  return data;
+}

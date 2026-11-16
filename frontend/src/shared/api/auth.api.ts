@@ -3,7 +3,7 @@ import type {
   IUserPublic,
   ILoginPayload,
   IRegisterPayload,
-  IAuthResponse
+  IAuthResponse, IUpdateProfilePayload, IChangePasswordPayload
 } from '@the-movies/shared';
 
 
@@ -29,4 +29,13 @@ export async function logout(): Promise<void> {
 export async function getMe(): Promise<IUserPublic> {
   const { data } = await api.get<IUserPublic>('/auth/@me');
   return data;
+}
+
+export async function updateProfile(payload: IUpdateProfilePayload): Promise<IUserPublic> {
+  const { data } = await api.patch<IUserPublic>('/auth/profile', payload);
+  return data;
+}
+
+export async function changePassword(payload: IChangePasswordPayload): Promise<void> {
+  await api.patch('/auth/password', payload);
 }

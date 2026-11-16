@@ -20,6 +20,9 @@ export function Header() {
           <Group gap="sm">
             {!isInitialized ? null : user ? (
               <>
+                <Button component={Link} to={ERoutes.LK} variant="subtle">
+                  {user.name}
+                </Button>
                 <Button component={Link} to={ERoutes.MOVIE_CREATE} variant="light">
                   Создать фильм
                 </Button>

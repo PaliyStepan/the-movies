@@ -29,3 +29,11 @@ export async function updateMovie(id: string, payload: Partial<ICreateMoviePaylo
   const { data } = await api.patch<IMovie>(`/movies/${id}`, payload);
   return data;
 }
+
+export async function getMyMovies(
+  params: { page?: number; limit?: number },
+  signal?: AbortSignal,
+): Promise<IPaginated<IMovie>> {
+  const { data } = await api.get<IPaginated<IMovie>>('/movies/me', { params, signal });
+  return data;
+}
