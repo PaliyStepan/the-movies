@@ -14,7 +14,7 @@ import {
 } from '@mantine/core';
 import {useQuery} from '@tanstack/react-query';
 import {getMovieById} from '@/entities/movie';
-import {getPosterUrl} from '@/entities/movie/lib/poster';
+import {getPosterUrl,getBackdropUrl} from '@/entities/movie/lib/poster';
 import {ERoutes, movieEditPath} from '@/shared/config/routes';
 import {GENRE_NAMES} from '@/entities/movie/lib/genres';
 import {useAuthStore} from "@/shared/auth/auth.store.ts";
@@ -49,7 +49,9 @@ export function MovieDetailPage() {
     );
   }
 
-  const backdrop = getPosterUrl(movie);
+  const backdrop = getBackdropUrl(movie);
+  const poster = getPosterUrl(movie);
+  const image = backdrop ?? poster;
 
   return (
     <Container size="md">
@@ -59,13 +61,14 @@ export function MovieDetailPage() {
 
       {backdrop && (
         <Image
-          src={backdrop ?? undefined}
+          src={image}
           alt={movie.title}
           radius="md"
           mb="lg"
-          h={300}
+          h={500}
           fit="cover"
           fallbackSrc="/no-photo.jpg"
+          style={{ objectPosition: 'top' }}
         />
       )}
 
@@ -102,7 +105,7 @@ export function MovieDetailPage() {
         )}
 
         <Button component={Link} to={reviewsListPath(movie.id)} variant="light">
-          Отзывы
+          Отзывы {movie.reviewsCount ? ` (${movie.reviewsCount})` : ''}
         </Button>
       </Group>
 

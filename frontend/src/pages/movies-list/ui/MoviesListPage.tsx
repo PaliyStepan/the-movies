@@ -1,5 +1,5 @@
-import { useSearchParams } from 'react-router-dom';
-import { useDebouncedValue } from '@mantine/hooks';
+import {useSearchParams} from 'react-router-dom';
+import {useDebouncedValue} from '@mantine/hooks';
 import {
   TextInput,
   CloseButton,
@@ -11,8 +11,29 @@ import {
   Loader,
   Center,
 } from '@mantine/core';
-import { useState, useEffect } from 'react';
-import { MovieCard, useMovies } from '@/entities/movie';
+import {useState, useEffect} from 'react';
+import {MovieCard, useMovies} from '@/entities/movie';
+
+const SearchInput = ({
+     value,
+     onChange,
+     onClear,
+   }: {
+  value: string;
+  onChange: (value: string) => void;
+  onClear: () => void;
+}) => {
+  return (
+    <TextInput
+      placeholder="Поиск фильмов (пример Batman)"
+      value={value}
+      onChange={(e) => onChange(e.currentTarget.value)}
+      rightSection={
+        value.length > 0 ? <CloseButton onClick={onClear}/> : null
+      }
+    />
+  );
+};
 
 export function MoviesListPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -21,7 +42,7 @@ export function MoviesListPage() {
   const page = Number(searchParams.get('page') ?? '1');
 
   const [input, setInput] = useState(search);
-  const [debouncedInput] = useDebouncedValue(input, 400);
+  const [debouncedInput] = useDebouncedValue(input, 500);
 
   useEffect(() => {
     if (debouncedInput === search) return;
@@ -29,10 +50,10 @@ export function MoviesListPage() {
     if (debouncedInput) params.set('search', debouncedInput);
     else params.delete('search');
     params.set('page', '1');
-    setSearchParams(params, { replace: true });
+    setSearchParams(params, {replace: true});
   }, [debouncedInput]);
 
-  const { data, isPending, isFetching } = useMovies({
+  const {data, isPending, isFetching} = useMovies({
     search: debouncedInput,
     page,
     limit: 20,
@@ -49,7 +70,7 @@ export function MoviesListPage() {
     const params = new URLSearchParams(searchParams);
     params.delete('search');
     params.set('page', '1');
-    setSearchParams(params, { replace: true });
+    setSearchParams(params, {replace: true});
   };
 
   const handlePageChange = (newPage: number) => {
@@ -62,14 +83,10 @@ export function MoviesListPage() {
     <Stack gap="lg">
       <Title order={2}>Фильмы</Title>
 
-      <TextInput
-        placeholder="Поиск фильмов (пример Batman)"
+      <SearchInput
         value={input}
-        onChange={(e) => handleSearchChange(e.currentTarget.value)}
-        disabled={isFetching}
-        rightSection={
-          input.length > 0 ? <CloseButton onClick={handleClear} /> : null
-        }
+        onChange={handleSearchChange}
+        onClear={handleClear}
       />
 
       {debouncedInput.trim().length > 0 && debouncedInput.trim().length < 3 && (
@@ -77,7 +94,7 @@ export function MoviesListPage() {
       )}
 
       {isFetching && debouncedInput.trim().length >= 3 && (
-        <Center py="xl"><Loader /></Center>
+        <Center py="xl"><Loader/></Center>
       )}
 
       {!isPending && data && data.items.length === 0 && (
@@ -86,9 +103,9 @@ export function MoviesListPage() {
 
       {data && data.items.length > 0 && (
         <>
-          <SimpleGrid cols={{ base: 2, md: 4, lg: 5 }} spacing="md">
+          <SimpleGrid cols={{base: 2, md: 4, lg: 5}} spacing="md">
             {data.items.map((movie) => (
-              <MovieCard key={movie.id} movie={movie} />
+              <MovieCard key={movie.id} movie={movie}/>
             ))}
           </SimpleGrid>
 

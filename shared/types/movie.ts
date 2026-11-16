@@ -14,6 +14,7 @@ export interface IMovie {
   createdAt: string;
   updatedAt: string;
   createdById: string | null;
+  reviewsCount?: number;
 }
 
 export interface IMovieListQuery {

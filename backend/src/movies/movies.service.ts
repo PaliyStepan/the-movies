@@ -60,9 +60,23 @@ export class MoviesService {
   }
 
   async findOne(id: string): Promise<IMovie> {
-    const movie = await this.prisma.movie.findUnique({ where: { id } });
+    const movie = await this.prisma.movie.findUnique({
+      where: { id },
+      include: {
+        _count: {
+          select: { reviews: true },
+        },
+      },
+    });
+
     if (!movie) throw new NotFoundException('Фильм не найден');
-    return this.toResponse(movie);
+
+    const { _count, ...rest } = movie;
+
+    return {
+      ...this.toResponse(rest),
+      reviewsCount: _count.reviews,
+    };
   }
 
   async create(dto: CreateMovieDto, userId: string): Promise<IMovie> {
