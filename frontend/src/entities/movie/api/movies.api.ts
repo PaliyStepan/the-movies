@@ -37,3 +37,7 @@ export async function getMyMovies(
   const { data } = await api.get<IPaginated<IMovie>>('/movies/me', { params, signal });
   return data;
 }
+
+export async function deleteMovie(id: string): Promise<void> {
+  await api.delete(`/movies/${id}`);
+}

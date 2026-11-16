@@ -17,11 +17,14 @@ import {
   Alert,
   Center,
   Loader,
+  Group,
 } from '@mantine/core';
+import { modals } from '@mantine/modals';
 import { ERoutes, movieDetailPath } from '@/shared/config/routes';
 import { useAuthStore } from '@/shared/auth/auth.store';
 import { getMovieById } from '@/entities/movie/api/movies.api';
 import { useUpdateMovie } from '@/entities/movie/model/use-update-movie';
+import { useDeleteMovie } from '@/entities/movie/model/use-delete-movie';
 import { GENRE_NAMES } from '@/entities/movie/lib/genres';
 
 const currentYear = new Date().getFullYear();
@@ -34,10 +37,7 @@ const editMovieSchema = z.object({
     .min(1888, 'Минимум 1888')
     .max(currentYear + 5, `Максимум ${currentYear + 5}`)
     .optional(),
-  description: z
-    .string()
-    .max(3000, 'Максимум 3000 символов')
-    .optional(),
+  description: z.string().max(5000, 'Максимум 5000 символов').optional(),
   originalTitle: z.string().max(200, 'Максимум 200 символов').optional(),
   originalLanguage: z
     .string()
@@ -81,6 +81,7 @@ export function MovieEditPage() {
   });
 
   const updateMutation = useUpdateMovie(id!);
+  const deleteMutation = useDeleteMovie(id!);
 
   const {
     register,
@@ -152,12 +153,33 @@ export function MovieEditPage() {
     });
   };
 
+  const handleDelete = () => {
+    modals.openConfirmModal({
+      title: 'Удалить фильм?',
+      children: <Text size="sm">Это действие нельзя отменить.</Text>,
+      labels: { confirm: 'Удалить', cancel: 'Отмена' },
+      confirmProps: { color: 'red' },
+      onConfirm: () => deleteMutation.mutate(),
+    });
+  };
+
   return (
-    <Stack maw={800} mx="auto" gap="md">
+    <Stack maw={600} mx="auto" gap="md">
       <Anchor component={Link} to={movieDetailPath(movie.id)} size="sm">
         ← Вернуться к фильму
       </Anchor>
-      <Title order={2}>Редактировать фильм</Title>
+
+      <Group justify="space-between" align="center">
+        <Title order={2}>Редактировать фильм</Title>
+        <Button
+          color="red"
+          variant="light"
+          onClick={handleDelete}
+          loading={deleteMutation.isPending}
+        >
+          Удалить фильм
+        </Button>
+      </Group>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack gap="sm">
@@ -165,7 +187,6 @@ export function MovieEditPage() {
             label="Название"
             placeholder="Например, Интерстеллар"
             error={errors.title?.message}
-            maxLength={200}
             withAsterisk
             {...register('title')}
           />
@@ -199,7 +220,8 @@ export function MovieEditPage() {
           <Textarea
             label="Описание"
             placeholder="Краткое описание фильма"
-            maxLength={3000}
+            minRows={3}
+            maxLength={5000}
             error={errors.description?.message}
             {...register('description')}
           />
@@ -207,7 +229,6 @@ export function MovieEditPage() {
           <TextInput
             label="Оригинальное название"
             placeholder="Interstellar"
-            maxLength={200}
             error={errors.originalTitle?.message}
             {...register('originalTitle')}
           />
@@ -294,12 +315,6 @@ export function MovieEditPage() {
           <Button type="submit" fullWidth loading={updateMutation.isPending}>
             Сохранить изменения
           </Button>
-
-          <Text ta="center" size="sm" c="dimmed">
-            <Anchor component={Link} to={movieDetailPath(movie.id)} size="sm">
-              Вернуться к фильму
-            </Anchor>
-          </Text>
         </Stack>
       </form>
     </Stack>
