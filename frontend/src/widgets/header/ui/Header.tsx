@@ -11,7 +11,7 @@ export function Header() {
 
   return (
     <header style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
-      <Container size="lg" h={64}>
+      <Container size="lg" py="md">
         <Group justify="space-between" h="100%">
           <Anchor component={Link} to={ERoutes.HOME} underline="never">
             <Text size="xl" fw={700} c="dark">TheMovies</Text>

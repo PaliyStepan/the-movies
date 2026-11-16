@@ -10,6 +10,7 @@ import {queryClient} from '@/shared/lib/query-client';
 import {AuthInitializer} from './providers/AuthInitializer';
 import App from './App';
 import './index.css';
+import {PosterNotice} from "@/app/providers/PosterNotice.tsx";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -17,6 +18,7 @@ createRoot(document.getElementById('root')!).render(
       <MantineProvider>
         <Notifications position="top-right" />
         <AuthInitializer>
+          <PosterNotice />
           <App/>
         </AuthInitializer>
       </MantineProvider>
