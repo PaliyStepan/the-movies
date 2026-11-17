@@ -44,6 +44,18 @@ export class MoviesController {
 
   @Authorization()
   @ApiBearerAuth()
+  @Get('favorites')
+  @ApiOperation({ summary: 'Избранные фильмы пользователя (пагинация)' })
+  @ApiOkResponse({ description: 'Пагинированный список избранных фильмов' })
+  findFavorites(
+    @Query() query: IMovieListQueryDto,
+    @Authorized('id') userId: string,
+  ) {
+    return this.moviesService.findFavorites(userId, query);
+  }
+
+  @Authorization()
+  @ApiBearerAuth()
   @Get('me')
   @ApiOperation({ summary: 'Мои созданные фильмы (пагинированные)' })
   @ApiOkResponse({ description: 'Пагинированный список моих фильмов' })
@@ -61,6 +73,42 @@ export class MoviesController {
   @ApiOkResponse({ description: 'Список рекомендованных фильмов' })
   findRecommendations(@Param('id') id: string) {
     return this.moviesService.findRecommendations(id);
+  }
+
+  @Authorization()
+  @ApiBearerAuth()
+  @Get(':id/favorite')
+  @ApiOperation({ summary: 'Проверить, добавлен ли фильм в избранное' })
+  @ApiParam({ name: 'id', description: 'UUID фильма' })
+  @ApiOkResponse({ description: 'Состояние избранного' })
+  getFavoriteStatus(
+    @Param('id') id: string,
+    @Authorized('id') userId: string,
+  ) {
+    return this.moviesService.getFavoriteStatus(id, userId);
+  }
+
+  @Authorization()
+  @ApiBearerAuth()
+  @Post(':id/favorite')
+  @ApiOperation({ summary: 'Добавить фильм в избранное' })
+  @ApiNoContentResponse({ description: 'Фильм добавлен в избранное' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  addToFavorites(@Param('id') id: string, @Authorized('id') userId: string) {
+    return this.moviesService.addToFavorites(id, userId);
+  }
+
+  @Authorization()
+  @ApiBearerAuth()
+  @Delete(':id/favorite')
+  @ApiOperation({ summary: 'Удалить фильм из избранного' })
+  @ApiNoContentResponse({ description: 'Фильм удалён из избранного' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  removeFromFavorites(
+    @Param('id') id: string,
+    @Authorized('id') userId: string,
+  ) {
+    return this.moviesService.removeFromFavorites(id, userId);
   }
 
   @Get(':id')

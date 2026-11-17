@@ -24,6 +24,7 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
   movies    Movie[]
   reviews   Review[]
+  favorites Movie[]  @relation("UserFavorites")
 
   @@map("users")
 }
@@ -46,6 +47,7 @@ model Movie {
   createdById      String?  @map("created_by_id")
   createdBy        User?    @relation(fields: [createdById], references: [id], onDelete: SetNull)
   reviews          Review[]
+  favoritedBy      User[]    @relation("UserFavorites")
 
   @@map("movies")
 }

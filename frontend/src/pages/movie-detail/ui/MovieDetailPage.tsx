@@ -13,8 +13,14 @@ import {
   Divider, Button, Grid,
   Card,
 } from '@mantine/core';
-import {useQuery} from '@tanstack/react-query';
-import {getMovieById, getMovieRecommendations} from '@/entities/movie';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {
+  addMovieToFavorites,
+  getMovieById,
+  getMovieFavoriteStatus,
+  getMovieRecommendations,
+  removeMovieFromFavorites,
+} from '@/entities/movie';
 import {getPosterUrl, getBackdropUrl} from '@/entities/movie/lib/poster';
 import {
   ERoutes,
@@ -33,6 +39,7 @@ import 'swiper/css/pagination';
 export function MovieDetailPage() {
   const {id} = useParams<{ id: string }>();
   const user = useAuthStore((s) => s.user);
+  const queryClient = useQueryClient();
 
   const {data: movie, isPending, isError} = useQuery({
     queryKey: ['movie', id],
@@ -46,6 +53,29 @@ export function MovieDetailPage() {
     queryKey: ['movie-recommendations', id],
     queryFn: ({signal}) => getMovieRecommendations(id!, signal),
     enabled: !!movie,
+  });
+
+  const {
+    data: favoriteStatus,
+    isPending: favoriteStatusPending,
+    isError: favoriteStatusError,
+  } = useQuery({
+    queryKey: ['movie-favorite', user?.id, id],
+    queryFn: ({signal}) => getMovieFavoriteStatus(id!, signal),
+    enabled: !!user && !!id,
+  });
+
+  const favoriteMutation = useMutation({
+    mutationFn: (isFavorite: boolean) =>
+      isFavorite
+        ? removeMovieFromFavorites(id!)
+        : addMovieToFavorites(id!),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({queryKey: ['movie-favorite', user?.id, id]}),
+        queryClient.invalidateQueries({queryKey: ['my-favorites']}),
+      ]);
+    },
   });
 
   if (isPending) {
@@ -119,6 +149,21 @@ export function MovieDetailPage() {
           </Group>
 
           <Group gap="xs">
+            {user && favoriteStatus && (
+              <Button
+                variant={favoriteStatus?.isFavorite ? 'filled' : 'light'}
+                loading={favoriteStatusPending || favoriteMutation.isPending}
+                disabled={favoriteStatusError}
+                onClick={() =>
+                  favoriteMutation.mutate(favoriteStatus?.isFavorite ?? false)
+                }
+              >
+                {favoriteStatus?.isFavorite
+                  ? 'Удалить из избранных'
+                  : 'Добавить в избранное'}
+              </Button>
+            )}
+
             {user && movie.createdById === user.id && (
               <Button component={Link} to={movieEditPath(movie.id)} variant="light">
                 Редактировать
@@ -129,6 +174,17 @@ export function MovieDetailPage() {
               Отзывы {movie.reviewsCount ? ` (${movie.reviewsCount})` : ''}
             </Button>
           </Group>
+
+          {favoriteMutation.isError && (
+            <Alert color="red" mt="sm">
+              Не удалось обновить избранное. Попробуйте ещё раз.
+            </Alert>
+          )}
+          {favoriteStatusError && (
+            <Alert color="red" mt="sm">
+              Не удалось проверить состояние избранного.
+            </Alert>
+          )}
 
           <Divider my="md"/>
 

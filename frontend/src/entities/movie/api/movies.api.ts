@@ -30,6 +30,17 @@ export async function getMovieRecommendations(
   return data;
 }
 
+export async function getMovieFavoriteStatus(
+  id: string,
+  signal?: AbortSignal,
+): Promise<{ isFavorite: boolean }> {
+  const {data} = await api.get<{ isFavorite: boolean }>(
+    `/movies/${id}/favorite`,
+    {signal},
+  );
+  return data;
+}
+
 export async function createMovie(payload: ICreateMoviePayload): Promise<IMovie> {
   const {data} = await api.post<IMovie>('/movies', payload);
   return data;
@@ -46,6 +57,25 @@ export async function getMyMovies(
 ): Promise<IPaginated<IMovie>> {
   const { data } = await api.get<IPaginated<IMovie>>('/movies/me', { params, signal });
   return data;
+}
+
+export async function getMyFavoriteMovies(
+  params: { page?: number; limit?: number },
+  signal?: AbortSignal,
+): Promise<IPaginated<IMovie>> {
+  const {data} = await api.get<IPaginated<IMovie>>('/movies/favorites', {
+    params,
+    signal,
+  });
+  return data;
+}
+
+export async function addMovieToFavorites(id: string): Promise<void> {
+  await api.post(`/movies/${id}/favorite`);
+}
+
+export async function removeMovieFromFavorites(id: string): Promise<void> {
+  await api.delete(`/movies/${id}/favorite`);
 }
 
 export async function deleteMovie(id: string): Promise<void> {

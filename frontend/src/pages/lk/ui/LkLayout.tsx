@@ -6,6 +6,7 @@ const menuItems = [
   { label: 'Общая информация', to: ERoutes.LK, end: true },
   { label: 'Ревью', to: ERoutes.LK_REVIEWS, end: false },
   { label: 'Фильмы', to: ERoutes.LK_MOVIES, end: false },
+  { label: 'Избранное', to: ERoutes.LK_FAVORITES, end: false },
 ];
 
 export function LkLayout() {

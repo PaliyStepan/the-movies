@@ -14,7 +14,9 @@ import { IMovieListQueryDto } from './dto/movie-list-query.dto.js';
 export class MoviesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(query: IMovieListQuery): Promise<IPaginated<IMovie>> {
+  async findAll(
+    query: IMovieListQuery,
+  ): Promise<IPaginated<IMovie>> {
     const search = query.search?.trim() ?? '';
 
     if (search.length < 3) {
@@ -51,7 +53,7 @@ export class MoviesService {
     ]);
 
     return {
-      items: items.map((m) => this.toResponse(m)),
+      items: items.map((movie) => this.toResponse(movie)),
       total,
       page,
       limit,
@@ -181,6 +183,79 @@ export class MoviesService {
     };
   }
 
+  async getFavoriteStatus(
+    id: string,
+    userId: string,
+  ): Promise<{ isFavorite: boolean }> {
+    const movie = await this.prisma.movie.findUnique({
+      where: { id },
+      select: {
+        favoritedBy: {
+          where: { id: userId },
+          select: { id: true },
+        },
+      },
+    });
+    if (!movie) throw new NotFoundException('Фильм не найден');
+
+    return { isFavorite: movie.favoritedBy.length > 0 };
+  }
+
+  async addToFavorites(id: string, userId: string): Promise<void> {
+    const movie = await this.prisma.movie.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+    if (!movie) throw new NotFoundException('Фильм не найден');
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { favorites: { connect: { id } } },
+    });
+  }
+
+  async removeFromFavorites(id: string, userId: string): Promise<void> {
+    const movie = await this.prisma.movie.findUnique({
+      where: { id },
+      select: { id: true },
+    });
+    if (!movie) throw new NotFoundException('Фильм не найден');
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { favorites: { disconnect: { id } } },
+    });
+  }
+
+  async findFavorites(
+    userId: string,
+    query: IMovieListQuery,
+  ): Promise<IPaginated<IMovie>> {
+    const page = Math.max(1, query.page ?? 1);
+    const limit = Math.min(100, Math.max(1, query.limit ?? 20));
+    const [favorites, total] = await this.prisma.$transaction([
+      this.prisma.movie.findMany({
+        where: { favoritedBy: { some: { id: userId } } },
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.movie.count({
+        where: { favoritedBy: { some: { id: userId } } },
+      }),
+    ]);
+
+    return {
+      items: favorites.map((movie) => ({
+        ...this.toResponse(movie),
+      })),
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
   async update(
     id: string,
     dto: UpdateMovieDto,
@@ -250,7 +325,7 @@ export class MoviesService {
     ]);
 
     return {
-      items: items.map((m) => this.toResponse(m)),
+      items: items.map((movie) => this.toResponse(movie)),
       total,
       page,
       limit,

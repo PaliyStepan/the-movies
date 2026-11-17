@@ -5,6 +5,7 @@ export const ERoutes = {
   LK: '/lk',
   LK_REVIEWS: '/lk/reviews',
   LK_MOVIES: '/lk/movies',
+  LK_FAVORITES: '/lk/favorites',
   MOVIE_CREATE: '/movies/create',
   MOVIE_EDIT: '/movies/edit/:id',
   MOVIE_DETAIL: '/movies/:id',
