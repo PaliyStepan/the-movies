@@ -51,6 +51,18 @@ export class MoviesController {
     return this.moviesService.findByUser(userId, query);
   }
 
+  @Get(':id/recommendations')
+  @ApiOperation({
+    summary: 'Похожие или популярные фильмы',
+    description:
+      'Возвращает до 10 фильмов с общими жанрами. Если похожих фильмов нет, возвращает фильмы с наивысшим рейтингом.',
+  })
+  @ApiParam({ name: 'id', description: 'UUID фильма' })
+  @ApiOkResponse({ description: 'Список рекомендованных фильмов' })
+  findRecommendations(@Param('id') id: string) {
+    return this.moviesService.findRecommendations(id);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Фильм по id' })
   @ApiParam({ name: 'id', description: 'UUID фильма' })

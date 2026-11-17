@@ -11,14 +11,24 @@ import {
   Alert,
   Anchor,
   Divider, Button, Grid,
+  Card,
 } from '@mantine/core';
 import {useQuery} from '@tanstack/react-query';
-import {getMovieById} from '@/entities/movie';
+import {getMovieById, getMovieRecommendations} from '@/entities/movie';
 import {getPosterUrl, getBackdropUrl} from '@/entities/movie/lib/poster';
-import {ERoutes, movieEditPath} from '@/shared/config/routes';
+import {
+  ERoutes,
+  movieDetailPath,
+  movieEditPath,
+  reviewsListPath,
+} from '@/shared/config/routes';
 import {GENRE_NAMES} from '@/entities/movie/lib/genres';
 import {useAuthStore} from "@/shared/auth/auth.store.ts";
-import {reviewsListPath} from '@/shared/config/routes';
+import {Swiper, SwiperSlide} from 'swiper/react';
+import {Navigation, Pagination} from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 export function MovieDetailPage() {
   const {id} = useParams<{ id: string }>();
@@ -28,6 +38,14 @@ export function MovieDetailPage() {
     queryKey: ['movie', id],
     queryFn: ({signal}) => getMovieById(id!, signal),
     enabled: !!id,
+  });
+
+  const {
+    data: recommendations,
+  } = useQuery({
+    queryKey: ['movie-recommendations', id],
+    queryFn: ({signal}) => getMovieRecommendations(id!, signal),
+    enabled: !!movie,
   });
 
   if (isPending) {
@@ -54,7 +72,7 @@ export function MovieDetailPage() {
   const image = backdrop ?? poster;
 
   return (
-    <Container size="md">
+    <Container size="md" pb={"xl"}>
       <Anchor component={Link} to={ERoutes.HOME} size="sm" mb="md" display="block">
         ← Назад к фильмам
       </Anchor>
@@ -133,6 +151,66 @@ export function MovieDetailPage() {
           )}
         </Grid.Col>
       </Grid>
+
+      {recommendations && recommendations.length > 0 && (
+        <>
+          <Divider my="xl"/>
+
+          <Title order={2} mb="md">
+            Рекомендуем
+          </Title>
+          <Swiper
+            modules={[Navigation, Pagination]}
+            navigation
+            pagination={{clickable: true}}
+            spaceBetween={16}
+            slidesPerView={1}
+            breakpoints={{
+              576: {slidesPerView: 2},
+              768: {slidesPerView: 3},
+              1200: {slidesPerView: 4},
+            }}
+          >
+            {recommendations.map((recommendation) => (
+              <SwiperSlide key={recommendation.id}>
+                <Card
+                  component={Link}
+                  to={movieDetailPath(recommendation.id)}
+                  withBorder
+                  padding="sm"
+                  mb="xl"
+                  style={{height: '360px', textDecoration: 'none'}}
+                >
+                  <Image
+                    src={getPosterUrl(recommendation)}
+                    alt={recommendation.title}
+                    h={240}
+                    fit="cover"
+                    fallbackSrc="/no-photo.jpg"
+                    radius="sm"
+                    mb="sm"
+                  />
+                  <Text fw={600} lineClamp={2}>
+                    {recommendation.title}
+                  </Text>
+                  <Group justify="space-between" mt="auto" pt={"xs"}>
+                    {recommendation.year && (
+                      <Text size="sm" c="dimmed">
+                        {recommendation.year}
+                      </Text>
+                    )}
+                    {recommendation.tmdbRating != null && (
+                      <Badge color="yellow" variant="light">
+                        ★ {recommendation.tmdbRating.toFixed(1)}
+                      </Badge>
+                    )}
+                  </Group>
+                </Card>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </>
+      )}
     </Container>
   );
 }

@@ -79,6 +79,66 @@ export class MoviesService {
     };
   }
 
+  async findRecommendations(id: string): Promise<IMovie[]> {
+    const movie = await this.prisma.movie.findUnique({ where: { id } });
+
+    if (!movie) {
+      throw new NotFoundException('Фильм не найден');
+    }
+
+    const excludeCurrentMovie = { id: { not: id } };
+    const orderBy = [
+      { tmdbRating: { sort: 'desc', nulls: 'last' } },
+      { voteCount: { sort: 'desc', nulls: 'last' } },
+    ] satisfies Prisma.MovieOrderByWithRelationInput[];
+
+    let similarMovies: Awaited<
+      ReturnType<typeof this.prisma.movie.findMany>
+    > = [];
+
+    if (movie.genreIds.length) {
+      const moviesWithAllGenres = await this.prisma.movie.findMany({
+          where: {
+            ...excludeCurrentMovie,
+            genreIds: { hasEvery: movie.genreIds },
+          },
+          orderBy,
+          take: 10,
+      });
+
+      const moviesWithSomeGenres =
+          moviesWithAllGenres.length < 10
+            ? await this.prisma.movie.findMany({
+                where: {
+                  ...excludeCurrentMovie,
+                  genreIds: { hasSome: movie.genreIds },
+                  NOT: { genreIds: { hasEvery: movie.genreIds } },
+                },
+                orderBy,
+                take: 10 - moviesWithAllGenres.length,
+              })
+            : [];
+
+      similarMovies = [...moviesWithAllGenres, ...moviesWithSomeGenres];
+    }
+
+    const recommendations =
+      similarMovies.length > 0
+          ? similarMovies
+          : await this.prisma.movie.findMany({
+            where: {
+              ...excludeCurrentMovie,
+              tmdbRating: { not: null },
+            },
+            orderBy,
+            take: 10,
+          });
+
+    return recommendations.map((recommendation) =>
+      this.toResponse(recommendation),
+    );
+  }
+
   async create(dto: CreateMovieDto, userId: string): Promise<IMovie> {
     const movie = await this.prisma.movie.create({
       data: {

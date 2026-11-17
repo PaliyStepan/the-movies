@@ -20,6 +20,16 @@ export async function getMovieById(
   return data;
 }
 
+export async function getMovieRecommendations(
+  id: string,
+  signal?: AbortSignal,
+): Promise<IMovie[]> {
+  const {data} = await api.get<IMovie[]>(`/movies/${id}/recommendations`, {
+    signal,
+  });
+  return data;
+}
+
 export async function createMovie(payload: ICreateMoviePayload): Promise<IMovie> {
   const {data} = await api.post<IMovie>('/movies', payload);
   return data;
