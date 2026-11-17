@@ -1,6 +1,6 @@
 # TheMovies — Backend
 
-NestJS 12 API with Prisma 7, PostgreSQL 16, JWT auth, and TMDB poster proxy.
+NestJS 12 API with Prisma 7, PostgreSQL 16, JWT auth, movie recommendations and user-specific favorites, and TMDB poster proxy.
 
 ## Stack
 
@@ -71,9 +71,30 @@ All routes are versioned under `/v1`.
 |---|---|---|
 | GET | `/v1/movies?search=&page=&limit=&sort=&order=` | Search (min. 3 chars), paginated |
 | GET | `/v1/movies/:id` | Movie by ID |
+| GET | `/v1/movies/:id/recommendations` | Up to 10 movies with matching genres; popular-rated fallback when there are no matches |
 | POST | `/v1/movies` | Create (auth) |
 | PATCH | `/v1/movies/:id` | Update (author only) |
 | DELETE | `/v1/movies/:id` | Delete (author only) |
+
+### Favorites
+
+Favorites are a many-to-many relation declared as `User.favorites Movie[]` and `Movie.favoritedBy User[]`. Prisma stores each user/movie pair in its implicit `_UserFavorites` join table; there is no global `isFavorite` field on `Movie`.
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/v1/movies/favorites?page=&limit=` | Current user's favorites, paginated (auth) |
+| GET | `/v1/movies/:id/favorite` | Check whether this movie is in the current user's favorites (auth); returns `{ "isFavorite": boolean }` |
+| POST | `/v1/movies/:id/favorite` | Add movie to current user's favorites (auth, `204`) |
+| DELETE | `/v1/movies/:id/favorite` | Remove movie from current user's favorites (auth, `204`) |
+
+### Reviews
+
+| Method | Path | Description |
+|---|---|---|
+| GET | `/v1/movies/:movieId/reviews?page=&limit=` | Paginated reviews for a movie |
+| GET | `/v1/reviews/:id` | Review by ID |
+| POST | `/v1/movies/:movieId/reviews` | Create a review (auth) |
+| GET | `/v1/reviews/me?page=&limit=` | Current user's reviews (auth) |
 
 ### Poster proxy
 

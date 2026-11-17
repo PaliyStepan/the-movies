@@ -1,6 +1,6 @@
 # TheMovies — Frontend
 
-React SPA for browsing movies, with search, pagination, and auth. Built with Vite, Mantine, TanStack Query, Zustand, and Feature-Sliced Design.
+React SPA for browsing movies, with search, pagination, recommendations, reviews, favorites, and auth. Built with Vite, Mantine, TanStack Query, Zustand, Swiper, and Feature-Sliced Design.
 
 ## Stack
 
@@ -9,6 +9,7 @@ React SPA for browsing movies, with search, pagination, and auth. Built with Vit
 - **TanStack Query** (server state)
 - **Zustand** (auth state: access token + user, in memory only)
 - **React Router** (routing)
+- **Swiper** (movie recommendation carousel)
 - **React Hook Form + Zod** (forms & validation)
 - **Feature-Sliced Design** (app / pages / widgets / entities / features / shared)
 
@@ -33,11 +34,19 @@ Backend must be running (see `../backend/README.md`).
 
     src/
     ├── app/          # providers, router, App.tsx, main.tsx
-    ├── pages/        # login, register, movies-list, movie-detail
+    ├── pages/        # login, register, movies-list, movie-detail, reviews, personal account
     ├── widgets/      # header
     ├── features/     # auth (useLogin, useRegister, useLogout)
     ├── entities/     # movie (MovieCard, useMovies, api)
     └── shared/       # api client, auth store, config, lib, ui
+
+## Movie favorites and recommendations
+
+- On a movie detail page, authenticated users can add a movie to or remove it from favorites.
+- The favorite state is loaded from the protected `GET /movies/:id/favorite` endpoint; it is user-specific and is not stored as a field on the movie.
+- The personal account's `/lk-favorites` page shows the current user's favorites with pagination.
+- Movie detail pages show a Swiper carousel of genre-based recommendations (or popular-rated movies when there are no genre matches).
+- Favorite entries are persisted by the backend in Prisma's implicit `_UserFavorites` join table. The backend migrations must be applied before using favorites.
 
 **Import rule:** a layer can only import from layers *below* it.
 
