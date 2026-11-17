@@ -1,8 +1,8 @@
-import { Link } from 'react-router-dom';
-import { Button, Group, Container, Text, Anchor } from '@mantine/core';
-import { useAuthStore } from '@/shared/auth/auth.store';
-import { ERoutes } from '@/shared/config/routes';
-import { useLogout } from '@/features/auth/model/use-auth';
+import {Link} from 'react-router-dom';
+import {Button, Group, Container, Text, Anchor} from '@mantine/core';
+import {useAuthStore} from '@/shared/auth/auth.store';
+import {ERoutes} from '@/shared/config/routes';
+import {useLogout} from '@/features/auth/model/use-auth';
 
 export function Header() {
   const user = useAuthStore((s) => s.user);
@@ -10,7 +10,7 @@ export function Header() {
   const logoutMutation = useLogout();
 
   return (
-    <header style={{ borderBottom: '1px solid var(--mantine-color-gray-3)' }}>
+    <header style={{borderBottom: '1px solid var(--mantine-color-gray-3)'}}>
       <Container size="lg" py="md">
         <Group justify="space-between" h="100%">
           <Anchor component={Link} to={ERoutes.HOME} underline="never">
@@ -23,12 +23,15 @@ export function Header() {
                 <Button component={Link} to={ERoutes.LK} variant="subtle">
                   {user.name}
                 </Button>
-                <Button component={Link} to={ERoutes.MOVIE_CREATE} variant="light">
-                  Создать фильм
-                </Button>
-                <Button variant="outline" onClick={() => logoutMutation.mutate()} loading={logoutMutation.isPending}>
-                  Выйти
-                </Button>
+
+                <Group gap="sm">
+                  <Button component={Link} to={ERoutes.MOVIE_CREATE} variant="light">
+                    Создать фильм
+                  </Button>
+                  <Button variant="outline" onClick={() => logoutMutation.mutate()} loading={logoutMutation.isPending}>
+                    Выйти
+                  </Button>
+                </Group>
               </>
             ) : (
               <>

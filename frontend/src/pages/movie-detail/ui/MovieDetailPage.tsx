@@ -10,11 +10,11 @@ import {
   Center,
   Alert,
   Anchor,
-  Divider, Button,
+  Divider, Button, Grid,
 } from '@mantine/core';
 import {useQuery} from '@tanstack/react-query';
 import {getMovieById} from '@/entities/movie';
-import {getPosterUrl,getBackdropUrl} from '@/entities/movie/lib/poster';
+import {getPosterUrl, getBackdropUrl} from '@/entities/movie/lib/poster';
 import {ERoutes, movieEditPath} from '@/shared/config/routes';
 import {GENRE_NAMES} from '@/entities/movie/lib/genres';
 import {useAuthStore} from "@/shared/auth/auth.store.ts";
@@ -59,75 +59,80 @@ export function MovieDetailPage() {
         ← Назад к фильмам
       </Anchor>
 
-      {backdrop && (
-        <Image
-          src={image}
-          alt={movie.title}
-          radius="md"
-          mb="lg"
-          h={500}
-          fit="cover"
-          fallbackSrc="/no-photo.jpg"
-          style={{ objectPosition: 'top' }}
-        />
-      )}
 
-      <Title order={1} mb="xs">
-        {movie.title}
-      </Title>
+      <Grid>
+        <Grid.Col span={{base: 12, md: 4}}>
+          <Image
+            src={image}
+            alt={movie.title}
+            radius="md"
+            mb="lg"
+            h={500}
+            fit="cover"
+            fallbackSrc="/no-photo.jpg"
+            style={{objectPosition: 'top'}}
+          />
+        </Grid.Col>
 
-      {movie.originalTitle && movie.originalTitle !== movie.title && (
-        <Text c="dimmed" size="sm" mb="sm">
-          {movie.originalTitle}
-        </Text>
-      )}
+        <Grid.Col span={{base: 12, md: 8}}>
+          <Title order={1} mb="xs">
+            {movie.title}
+          </Title>
 
-      <Group gap="xs" mb="md">
-        {movie.year && <Badge variant="light">{movie.year}</Badge>}
-        {movie.tmdbRating != null && (
-          <Badge color="yellow" variant="light">
-            ★ {movie.tmdbRating.toFixed(1)}
-          </Badge>
-        )}
-        {movie.voteCount != null && (
-          <Badge variant="outline">{movie.voteCount} голосов</Badge>
-        )}
-        {movie.originalLanguage && (
-          <Badge variant="outline">{movie.originalLanguage.toUpperCase()}</Badge>
-        )}
-      </Group>
+          {movie.originalTitle && movie.originalTitle !== movie.title && (
+            <Text c="dimmed" size="sm" mb="sm">
+              {movie.originalTitle}
+            </Text>
+          )}
 
-      <Group gap="xs">
-        {user && movie.createdById === user.id && (
-          <Button component={Link} to={movieEditPath(movie.id)} variant="light">
-            Редактировать
-          </Button>
-        )}
+          <Group gap="xs" mb="md">
+            {movie.year && <Badge variant="light">{movie.year}</Badge>}
+            {movie.tmdbRating != null && (
+              <Badge color="yellow" variant="light">
+                ★ {movie.tmdbRating.toFixed(1)}
+              </Badge>
+            )}
+            {movie.voteCount != null && (
+              <Badge variant="outline">{movie.voteCount} голосов</Badge>
+            )}
+            {movie.originalLanguage && (
+              <Badge variant="outline">{movie.originalLanguage.toUpperCase()}</Badge>
+            )}
+          </Group>
 
-        <Button component={Link} to={reviewsListPath(movie.id)} variant="light">
-          Отзывы {movie.reviewsCount ? ` (${movie.reviewsCount})` : ''}
-        </Button>
-      </Group>
+          <Group gap="xs">
+            {user && movie.createdById === user.id && (
+              <Button component={Link} to={movieEditPath(movie.id)} variant="light">
+                Редактировать
+              </Button>
+            )}
 
-      <Divider my="md"/>
+            <Button component={Link} to={reviewsListPath(movie.id)} variant="light">
+              Отзывы {movie.reviewsCount ? ` (${movie.reviewsCount})` : ''}
+            </Button>
+          </Group>
 
-      {movie.description ? (
-        <Text size="md">{movie.description}</Text>
-      ) : (
-        <Text c="dimmed" fs="italic">
-          Описание отсутствует
-        </Text>
-      )}
+          <Divider my="md"/>
 
-      {movie.genreIds.length > 0 && (
-        <Group gap="xs" mt="lg">
-          {movie.genreIds.map((genreId) => (
-            <Badge key={genreId} variant="dot">
-              {GENRE_NAMES[genreId] ?? `Жанр ${genreId}`}
-            </Badge>
-          ))}
-        </Group>
-      )}
+          {movie.description ? (
+            <Text size="md">{movie.description}</Text>
+          ) : (
+            <Text c="dimmed" fs="italic">
+              Описание отсутствует
+            </Text>
+          )}
+
+          {movie.genreIds.length > 0 && (
+            <Group gap="xs" mt="lg">
+              {movie.genreIds.map((genreId) => (
+                <Badge key={genreId} variant="dot">
+                  {GENRE_NAMES[genreId] ?? `Жанр ${genreId}`}
+                </Badge>
+              ))}
+            </Group>
+          )}
+        </Grid.Col>
+      </Grid>
     </Container>
   );
 }

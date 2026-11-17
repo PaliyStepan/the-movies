@@ -1,5 +1,5 @@
-import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import {Link, useParams, useSearchParams} from 'react-router-dom';
+import {useQuery} from '@tanstack/react-query';
 import {
   Anchor,
   Button,
@@ -12,9 +12,8 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { useAuthStore } from '@/shared/auth/auth.store';
-import { getMovieById } from '@/entities/movie/api/movies.api';
-import { useReviews } from '@/entities/review/model/use-reviews';
+import {getMovieById} from '@/entities/movie/api/movies.api';
+import {useReviews} from '@/entities/review/model/use-reviews';
 import {
   movieDetailPath,
   reviewCreatePath,
@@ -24,19 +23,18 @@ import {
 const LIMIT = 10;
 
 export function ReviewsListPage() {
-  const { movieId } = useParams<{ movieId: string }>();
-  const user = useAuthStore((s) => s.user);
+  const {movieId} = useParams<{ movieId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = Number(searchParams.get('page') ?? '1');
 
-  const { data: movie } = useQuery({
+  const {data: movie} = useQuery({
     queryKey: ['movie', movieId],
-    queryFn: ({ signal }) => getMovieById(movieId!, signal),
+    queryFn: ({signal}) => getMovieById(movieId!, signal),
     enabled: !!movieId,
   });
 
-  const { data, isPending } = useReviews(movieId!, { page, limit: LIMIT });
+  const {data, isPending} = useReviews(movieId!, {page, limit: LIMIT});
 
   const handlePageChange = (newPage: number) => {
     const params = new URLSearchParams(searchParams);
@@ -47,7 +45,7 @@ export function ReviewsListPage() {
   if (isPending) {
     return (
       <Center py="xl">
-        <Loader />
+        <Loader/>
       </Center>
     );
   }
@@ -62,11 +60,10 @@ export function ReviewsListPage() {
         <Title order={2}>
           Отзывы{movie ? ` к фильму «${movie.title}»` : ''}
         </Title>
-        {user && (
-          <Button component={Link} to={reviewCreatePath(movieId!)}>
-            Оставить отзыв
-          </Button>
-        )}
+
+        <Button component={Link} to={reviewCreatePath(movieId!)}>
+          Оставить отзыв
+        </Button>
       </Group>
 
       {!data || data.items.length === 0 ? (
@@ -80,7 +77,7 @@ export function ReviewsListPage() {
               to={reviewDetailPath(review.id)}
               withBorder
               padding="md"
-              style={{ textDecoration: 'none' }}
+              style={{textDecoration: 'none'}}
             >
               <Stack gap="xs">
                 {review.title && (
