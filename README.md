@@ -4,7 +4,6 @@ Full-stack pet project: movie catalog with authentication, search, recommendatio
 
 **Stack:** NestJS 12 · Prisma 7 · PostgreSQL 16 · React 19 · Vite · Mantine · TanStack Query · Zustand · Swiper · TypeScript (ESM)
 
-
 ## Structure
 
     the-movies/
