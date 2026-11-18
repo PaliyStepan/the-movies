@@ -1,6 +1,6 @@
 # TheMovies — Backend
 
-NestJS 12 API with Prisma 7, PostgreSQL 16, JWT auth, movie recommendations and user-specific favorites, and TMDB poster proxy.
+NestJS 12 API with Prisma 7, PostgreSQL 16, JWT auth, movie recommendations and user-specific favorites.
 
 ## Stack
 
@@ -16,7 +16,8 @@ Copy `.env.example` to `.env` and fill in:
 
 | Variable | Description |
 |---|---|
-| `DATABASE_URL` | PostgreSQL connection string |
+| `DATABASE_URL` | PostgreSQL connection string (pooled in prod) |
+| `DIRECT_URL` | Direct (non-pooled) connection string, used for migrations in prod |
 | `JWT_SECRET` | Secret for signing tokens (change in prod) |
 | `JWT_ACCESS_TOKEN_TTL` | Access token TTL (e.g. `15m`) |
 | `JWT_REFRESH_TOKEN_TTL` | Refresh token TTL (e.g. `7d`) |
@@ -33,8 +34,10 @@ Copy `.env.example` to `.env` and fill in:
 ### 2. Install & migrate
 
     npm install
-    npx prisma migrate dev
-    npx prisma generate
+    npx prisma7 migrate dev
+    npx prisma7 generate
+
+> If you use Prisma 7, run CLI via `npx prisma7` (package `@prisma/prisma7`). Plain `npx prisma` may pull Prisma 8 and break.
 
 ### 3. Dev server
 
@@ -64,12 +67,15 @@ All routes are versioned under `/v1`.
 | POST | `/v1/auth/refresh` | Rotate access token via cookie |
 | POST | `/v1/auth/logout` | Clear refresh cookie |
 | GET | `/v1/auth/@me` | Current user (auth required) |
+| PATCH | `/v1/auth/profile` | Update name/lastName (auth) |
+| PATCH | `/v1/auth/password` | Change password (auth, `204`) |
 
 ### Movies
 
 | Method | Path | Description |
 |---|---|---|
 | GET | `/v1/movies?search=&page=&limit=&sort=&order=` | Search (min. 3 chars), paginated |
+| GET | `/v1/movies/me?page=&limit=` | Current user's created movies (auth) |
 | GET | `/v1/movies/:id` | Movie by ID |
 | GET | `/v1/movies/:id/recommendations` | Up to 10 movies with matching genres; popular-rated fallback when there are no matches |
 | POST | `/v1/movies` | Create (auth) |
@@ -93,14 +99,10 @@ Favorites are a many-to-many relation declared as `User.favorites Movie[]` and `
 |---|---|---|
 | GET | `/v1/movies/:movieId/reviews?page=&limit=` | Paginated reviews for a movie |
 | GET | `/v1/reviews/:id` | Review by ID |
-| POST | `/v1/movies/:movieId/reviews` | Create a review (auth) |
 | GET | `/v1/reviews/me?page=&limit=` | Current user's reviews (auth) |
-
-### Poster proxy
-
-| Method | Path | Description |
-|---|---|---|
-| GET | `/v1/poster?path=/xxx.jpg` | Proxies TMDB images (bypasses regional blocks) |
+| POST | `/v1/movies/:movieId/reviews` | Create a review (auth) |
+| PATCH | `/v1/reviews/:id` | Update review (author only) |
+| DELETE | `/v1/reviews/:id` | Delete review (author only, `204`) |
 
 ## Scripts
 
@@ -109,7 +111,7 @@ Favorites are a many-to-many relation declared as `User.favorites Movie[]` and `
 | `npm run start:dev` | Dev server with watch |
 | `npm run build` | Compile to `dist/` |
 | `npm run start:prod` | Run compiled build |
-| `npx prisma migrate dev` | Create & apply migration |
-| `npx prisma migrate deploy` | Apply migrations (prod) |
-| `npx prisma generate` | Regenerate Prisma Client |
-| `npx prisma studio` | Open Prisma Studio |
+| `npx prisma7 migrate dev` | Create & apply migration (local) |
+| `npx prisma7 migrate deploy` | Apply migrations (prod) |
+| `npx prisma7 generate` | Regenerate Prisma Client |
+| `npx prisma7 studio` | Open Prisma Studio |

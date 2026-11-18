@@ -13,6 +13,7 @@ export function useCreateMovie() {
     mutationFn: (payload: ICreateMoviePayload) => createMovie(payload),
     onSuccess: (movie) => {
       queryClient.invalidateQueries({ queryKey: ['movies'] });
+      queryClient.invalidateQueries({ queryKey: ['my-movies'] });
       notifications.show({
         title: 'Фильм создан',
         message: `«${movie.title}» добавлен в каталог`,

@@ -1,8 +1,9 @@
 # TheMovies
 
-Full-stack pet project: movie catalog with authentication, search, recommendations, reviews, and user-specific favorites.
+Full-stack pet project: movie catalog with authentication, search, recommendations, reviews, favorites, and a personal account.
 
 **Stack:** NestJS 12 · Prisma 7 · PostgreSQL 16 · React 19 · Vite · Mantine · TanStack Query · Zustand · Swiper · TypeScript (ESM)
+
 
 ## Structure
 
@@ -17,13 +18,15 @@ Full-stack pet project: movie catalog with authentication, search, recommendatio
 
     docker run --name movie-db -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=movieapp -p 5432:5432 -d postgres:17
 
+Wait a few seconds until Postgres is ready to accept connections.
+
 ### 2. Backend
 
     cd backend
     cp .env.example .env
     npm install
-    npx prisma migrate dev
-    npx prisma generate
+    npx prisma7 migrate dev
+    npx prisma7 generate
     npm run start:dev
 
 API: http://localhost:3000  
@@ -40,16 +43,15 @@ App: http://localhost:5173
 
 ## Features
 
-- JWT auth (access 15m + refresh 7d in httpOnly cookie)
+- JWT auth (access 15m + refresh 7d in httpOnly cookie, stateless)
 - Movie CRUD with author check
 - Search (min. 3 chars, debounced), pagination, sorting
 - Genre-based movie recommendations with popular-rated fallback
-- User-specific movie favorites and a paginated favorites list in the personal account
-- Movie reviews
+- User-specific favorites (many-to-many) with a paginated list in the personal account
+- Movie reviews with author check
+- Personal account: profile, password change, my reviews, my movies, favorites
 - TMDB dataset import (~10k movies)
-- TMDB poster proxy (bypasses regional blocks)
-
-Favorite movies are stored as a many-to-many `User`–`Movie` relation in Prisma's implicit `_UserFavorites` join table. Apply database migrations before running the app.
+- TMDB posters served through `wsrv.nl` (bypasses regional CDN blocks)
 
 ## Docs
 
@@ -58,5 +60,8 @@ Favorite movies are stored as a many-to-many `User`–`Movie` relation in Prisma
 
 ## Live demo
 
-- Frontend: _TBD_
-- API: _TBD_
+- Frontend: https://the-movies-app.layero.app
+- API: https://the-movies-bff.layero.app/v1
+- Swagger: https://the-movies-bff.layero.app/docs/v1
+
+> Note: TMDB's image CDN is blocked in some regions. Posters are proxied through `wsrv.nl`; if images still don't load, a VPN may be required.

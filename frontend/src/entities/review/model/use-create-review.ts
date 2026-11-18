@@ -13,6 +13,7 @@ export function useCreateReview(movieId: string) {
     mutationFn: (payload: ICreateReviewPayload) => createReview(movieId, payload),
     onSuccess: (review) => {
       queryClient.invalidateQueries({ queryKey: ['reviews', movieId] });
+      queryClient.invalidateQueries({ queryKey: ['my-reviews'] });
       notifications.show({
         title: 'Отзыв создан',
         message: 'Ваш отзыв опубликован',

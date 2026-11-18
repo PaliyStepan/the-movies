@@ -12,6 +12,7 @@ export function useDeleteReview(id: string, movieId: string) {
     mutationFn: () => deleteReview(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reviews', movieId] });
+      queryClient.invalidateQueries({ queryKey: ['my-reviews'] });
       notifications.show({
         title: 'Отзыв удалён',
         message: 'Отзыв был удалён',
