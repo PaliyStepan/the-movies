@@ -66,9 +66,17 @@ export function ReviewCreatePage() {
           <Textarea
             label="Отзыв"
             placeholder="Поделитесь впечатлениями о фильме"
-            minRows={6}
             maxLength={5000}
             withAsterisk
+            autosize
+            minRows={3}
+            minLength={8}
+            styles={{
+              input: {
+                maxHeight: 120,
+                overflowY: 'auto',
+              },
+            }}
             error={errors.description?.message}
             {...register('description')}
           />

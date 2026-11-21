@@ -73,12 +73,14 @@ export function RegisterPage() {
             label="Имя"
             placeholder="Ваше имя"
             error={errors.name?.message}
+            maxLength={50}
             {...register('name')}
           />
 
           <TextInput
             label="Email"
             placeholder="example@example.ru"
+            maxLength={50}
             error={errors.email?.message}
             {...register('email')}
           />
@@ -86,6 +88,8 @@ export function RegisterPage() {
           <PasswordInput
             label="Пароль"
             placeholder="••••••"
+            minLength={6}
+            maxLength={20}
             error={errors.password?.message}
             {...register('password')}
           />
@@ -93,6 +97,8 @@ export function RegisterPage() {
           <PasswordInput
             label="Повторите пароль"
             placeholder="••••••"
+            minLength={6}
+            maxLength={20}
             error={errors.confirmPassword?.message}
             {...register('confirmPassword')}
           />

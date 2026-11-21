@@ -17,7 +17,7 @@ import {
   Alert,
   Center,
   Loader,
-  Group,
+  Group, Tooltip, ActionIcon,
 } from '@mantine/core';
 import { modals } from '@mantine/modals';
 import { ERoutes, movieDetailPath } from '@/shared/config/routes';
@@ -220,8 +220,16 @@ export function MovieEditPage() {
           <Textarea
             label="Описание"
             placeholder="Краткое описание фильма"
+            maxLength={3000}
+            autosize
             minRows={3}
-            maxLength={5000}
+            minLength={8}
+            styles={{
+              input: {
+                maxHeight: 120,
+                overflowY: 'auto',
+              },
+            }}
             error={errors.description?.message}
             {...register('description')}
           />
@@ -242,7 +250,41 @@ export function MovieEditPage() {
           />
 
           <TextInput
-            label="Ссылка на постер"
+            label={
+              <span style={{display: 'inline-flex', alignItems: 'center', gap: 6}}>
+              Ссылка на постер
+              <Tooltip
+                label="В рамках пет-проекта загрузка изображений не реализована. Пожалуйста, вставьте ссылку на картинку."
+                withArrow
+                multiline
+                w={280}
+                events={{hover: true, focus: true, touch: true}}
+              >
+                <ActionIcon
+                  variant="transparent"
+                  size="sm"
+                  aria-label="Информация о ссылке на постер"
+                >
+                   <svg
+                     width="16"
+                     height="16"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     aria-hidden="true"
+                   >
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+                    <circle cx="12" cy="8" r="1" fill="currentColor" />
+                    <path
+                      d="M12 11.5V16"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </ActionIcon>
+              </Tooltip>
+            </span>
+            }
             placeholder="https://example.com/poster.jpg"
             error={errors.posterPath?.message}
             {...register('posterPath')}

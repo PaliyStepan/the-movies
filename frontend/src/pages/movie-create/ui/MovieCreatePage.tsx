@@ -1,7 +1,7 @@
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Link } from 'react-router-dom';
-import { z } from 'zod';
+import {useForm, Controller} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {Link} from 'react-router-dom';
+import {z} from 'zod';
 import {
   TextInput,
   Textarea,
@@ -13,17 +13,19 @@ import {
   Anchor,
   MultiSelect,
   Alert,
+  ActionIcon,
+  Tooltip
 } from '@mantine/core';
-import { ERoutes } from '@/shared/config/routes';
-import { useCreateMovie } from '@/entities/movie/model/use-create-movie';
-import { GENRE_NAMES } from '@/entities/movie/lib/genres';
+import {ERoutes} from '@/shared/config/routes';
+import {useCreateMovie} from '@/entities/movie/model/use-create-movie';
+import {GENRE_NAMES} from '@/entities/movie/lib/genres';
 
 const currentYear = new Date().getFullYear();
 
 const createMovieSchema = z.object({
   title: z.string().min(1, 'Введите название').max(200, 'Максимум 200 символов'),
   year: z
-    .number({ error: 'Введите год числом' })
+    .number({error: 'Введите год числом'})
     .int('Год должен быть целым')
     .min(1888, 'Минимум 1888')
     .max(currentYear + 5, `Максимум ${currentYear + 5}`)
@@ -45,12 +47,12 @@ const createMovieSchema = z.object({
     .optional()
     .or(z.literal('')),
   tmdbRating: z
-    .number({ error: 'Введите рейтинг числом' })
+    .number({error: 'Введите рейтинг числом'})
     .min(0, 'Минимум 0')
     .max(10, 'Максимум 10')
     .optional(),
   voteCount: z
-    .number({ error: 'Введите число голосов' })
+    .number({error: 'Введите число голосов'})
     .int('Должно быть целым')
     .min(0, 'Минимум 0')
     .optional(),
@@ -71,7 +73,7 @@ export function MovieCreatePage() {
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: {errors},
   } = useForm<CreateMovieFormValues>({
     resolver: zodResolver(createMovieSchema),
     defaultValues: {
@@ -116,7 +118,7 @@ export function MovieCreatePage() {
           <Controller
             name="year"
             control={control}
-            render={({ field }) => (
+            render={({field}) => (
               <TextInput
                 label="Год"
                 placeholder="2014"
@@ -136,6 +138,15 @@ export function MovieCreatePage() {
             label="Описание"
             placeholder="Краткое описание фильма"
             maxLength={3000}
+            autosize
+            minRows={3}
+            minLength={8}
+            styles={{
+              input: {
+                maxHeight: 120,
+                overflowY: 'auto',
+              },
+            }}
             error={errors.description?.message}
             {...register('description')}
           />
@@ -156,8 +167,43 @@ export function MovieCreatePage() {
             {...register('originalLanguage')}
           />
 
+
           <TextInput
-            label="Ссылка на постер"
+            label={
+              <span style={{display: 'inline-flex', alignItems: 'center', gap: 6}}>
+              Ссылка на постер
+              <Tooltip
+                label="В рамках пет-проекта загрузка изображений не реализована. Пожалуйста, вставьте ссылку на картинку."
+                withArrow
+                multiline
+                w={280}
+                events={{hover: true, focus: true, touch: true}}
+              >
+                <ActionIcon
+                  variant="transparent"
+                  size="sm"
+                  aria-label="Информация о ссылке на постер"
+                >
+                   <svg
+                     width="16"
+                     height="16"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     aria-hidden="true"
+                   >
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+                    <circle cx="12" cy="8" r="1" fill="currentColor" />
+                    <path
+                      d="M12 11.5V16"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                </ActionIcon>
+              </Tooltip>
+            </span>
+            }
             placeholder="https://example.com/poster.jpg"
             error={errors.posterPath?.message}
             {...register('posterPath')}
@@ -166,7 +212,7 @@ export function MovieCreatePage() {
           <Controller
             name="tmdbRating"
             control={control}
-            render={({ field }) => (
+            render={({field}) => (
               <NumberInput
                 label="Рейтинг TMDB"
                 placeholder="8.7"
@@ -192,7 +238,7 @@ export function MovieCreatePage() {
           <Controller
             name="voteCount"
             control={control}
-            render={({ field }) => (
+            render={({field}) => (
               <NumberInput
                 label="Количество голосов"
                 placeholder="29843"
@@ -210,7 +256,7 @@ export function MovieCreatePage() {
           <Controller
             name="genreIds"
             control={control}
-            render={({ field }) => (
+            render={({field}) => (
               <MultiSelect
                 label="Жанры"
                 placeholder="Выберите жанры"

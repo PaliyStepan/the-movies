@@ -1,6 +1,7 @@
 import { Link, useSearchParams } from 'react-router-dom';
 import {
   Anchor,
+  Button,
   Card,
   Center,
   Group,
@@ -14,7 +15,7 @@ import {
 } from '@mantine/core';
 import { useMyMovies } from '@/entities/movie/model/use-my-movies';
 import { getPosterUrl } from '@/entities/movie/lib/poster';
-import { movieDetailPath, movieEditPath } from '@/shared/config/routes';
+import {ERoutes, movieDetailPath, movieEditPath} from '@/shared/config/routes';
 
 const LIMIT = 10;
 
@@ -40,7 +41,13 @@ export function LkMoviesPage() {
 
   return (
     <Stack gap="md">
-      <Title order={3}>Мои фильмы</Title>
+      <Group gap="sm" justify="space-between">
+        <Title order={3}>Мои фильмы</Title>
+
+        <Button component={Link} to={ERoutes.MOVIE_CREATE} variant="light">
+          Создать фильм
+        </Button>
+      </Group>
 
       {!data || data.items.length === 0 ? (
         <Text c="dimmed">Вы ещё не создали ни одного фильма.</Text>
@@ -55,11 +62,12 @@ export function LkMoviesPage() {
                     src={poster ?? undefined}
                     alt={movie.title}
                     height={200}
+                    style={{height: '200px'}}
                     fallbackSrc="/no-photo.jpg"
                   />
                 </Card.Section>
 
-                <Stack gap="xs" mt="sm">
+                <Stack gap="xs" mt="sm" flex={1}>
                   <Text fw={600} lineClamp={2}>
                     {movie.title}
                   </Text>
@@ -68,7 +76,7 @@ export function LkMoviesPage() {
                       {movie.year}
                     </Text>
                   )}
-                  <Group justify="space-between">
+                  <Group justify="space-between" mt={'auto'}>
                     <Anchor
                       component={Link}
                       to={movieDetailPath(movie.id)}

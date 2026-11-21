@@ -87,7 +87,7 @@ export function LkLayout() {
                   rightSection={
                     item.countKey &&
                     !countsPending &&
-                    counts[item.countKey] !== undefined && (
+                    (counts[item.countKey] ?? 0) > 0 && (
                       <Badge size="sm" variant="filled">
                         {counts[item.countKey]}
                       </Badge>

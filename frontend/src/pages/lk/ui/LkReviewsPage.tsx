@@ -40,7 +40,12 @@ export function LkReviewsPage() {
       <Title order={3}>Мои отзывы</Title>
 
       {!data || data.items.length === 0 ? (
-        <Text c="dimmed">Вы ещё не оставили ни одного отзыва.</Text>
+        <Text c="dimmed">
+          Вы ещё не оставили ни одного отзыва.{' '}
+          <Anchor component={Link} to="/">
+            Перейти к фильмам
+          </Anchor>
+        </Text>
       ) : (
         <Stack gap="sm">
           {data.items.map((review) => (

@@ -100,14 +100,14 @@ export function LkInfoPage() {
           />
           <TextInput
             label="Имя"
-            placeholder="Степан"
+            placeholder="Иван"
             error={profileForm.formState.errors.name?.message}
             withAsterisk
             {...profileForm.register('name')}
           />
           <TextInput
             label="Фамилия"
-            placeholder="Палий"
+            placeholder="Иванов"
             error={profileForm.formState.errors.lastName?.message}
             {...profileForm.register('lastName')}
           />
