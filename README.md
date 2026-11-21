@@ -13,16 +13,21 @@ Full-stack pet project: movie catalog with authentication, search, recommendatio
 
 ## Quick start
 
+**Requirements:** Node.js 22.12+ (npm included), and Docker with PostgreSQL, or an existing PostgreSQL database.
+
 ### 1. Database (Docker)
 
-    docker run --name movie-db -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=movieapp -p 5432:5432 -d postgres:17
+    docker run --name movie-db -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=movieapp -p 5432:5432 -v movie-db-data:/var/lib/postgresql/data -d postgres:16
 
-Wait a few seconds until Postgres is ready to accept connections.
+The named volume keeps database files when the container is stopped or removed. Wait until PostgreSQL is ready to accept connections.
+
+To use your own PostgreSQL instead, create an empty database and set `DATABASE_URL` in `backend/.env` to its connection string (for example, `postgresql://USER:PASSWORD@HOST:5432/DATABASE?schema=public`). You do not need to start the Docker container in that case.
 
 ### 2. Backend
 
     cd backend
     cp .env.example .env
+    # Edit DATABASE_URL if you are not using the Docker defaults above.
     npm install
     npx prisma7 migrate dev
     npx prisma7 generate
@@ -39,6 +44,8 @@ Swagger: http://localhost:3000/docs/v1
     npm run dev
 
 App: http://localhost:5173
+
+The migrations create the schema but do not populate the movie catalog. To add movies, follow the optional [TMDB dataset import](./backend/README.md#import-movies-tmdb-dataset) instructions.
 
 ## Features
 

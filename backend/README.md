@@ -16,8 +16,7 @@ Copy `.env.example` to `.env` and fill in:
 
 | Variable | Description |
 |---|---|
-| `DATABASE_URL` | PostgreSQL connection string (pooled in prod) |
-| `DIRECT_URL` | Direct (non-pooled) connection string, used for migrations in prod |
+| `DATABASE_URL` | PostgreSQL connection string used by both the API and Prisma CLI. For migrations, configure it to connect directly to PostgreSQL. |
 | `JWT_SECRET` | Secret for signing tokens (change in prod) |
 | `JWT_ACCESS_TOKEN_TTL` | Access token TTL (e.g. `15m`) |
 | `JWT_REFRESH_TOKEN_TTL` | Refresh token TTL (e.g. `7d`) |
@@ -25,17 +24,25 @@ Copy `.env.example` to `.env` and fill in:
 | `PORT` | Server port (default 3000) |
 | `FRONTEND_URL` | Allowed CORS origin(s), comma-separated |
 
+`DIRECT_URL` is not currently read by the application or Prisma config. For local development, set `DATABASE_URL` to the database you want to use; the database itself must already exist.
+
 ## Run locally
 
 ### 1. Start Postgres
 
-    docker run --name movie-db -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=movieapp -p 5432:5432 -d postgres:17
+    docker run --name movie-db -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=movieapp -p 5432:5432 -v movie-db-data:/var/lib/postgresql/data -d postgres:16
 
-### 2. Install & migrate
+Alternatively, use an existing local or hosted PostgreSQL database. Create an empty database, set its connection string in `DATABASE_URL` in `.env`, and skip the Docker step.
+
+### 2. Configure, install & migrate
+
+    cp .env.example .env
 
     npm install
     npx prisma7 migrate dev
     npx prisma7 generate
+
+The example `.env` connection string matches the Docker command above. Edit it when using a different database, username, password, host, or port. `migrate dev` applies all committed migrations and creates the tables; it does not import movie data.
 
 > If you use Prisma 7, run CLI via `npx prisma7` (package `@prisma/prisma7`). Plain `npx prisma` may pull Prisma 8 and break.
 
