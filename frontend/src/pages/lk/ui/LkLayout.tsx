@@ -46,13 +46,20 @@ const menuItems: LkMenuItem[] = [
 ];
 
 export function LkLayout() {
-  const { data: reviews } = useMyReviews({ page: 1, limit: 1 });
-  const { data: movies } = useMyMovies({ page: 1, limit: 1 });
-  const { data: favorites } = useQuery({
+  const { data: reviews, isPending: reviewsPending } = useMyReviews({
+    page: 1,
+    limit: 1,
+  });
+  const { data: movies, isPending: moviesPending } = useMyMovies({
+    page: 1,
+    limit: 1,
+  });
+  const { data: favorites, isPending: favoritesPending } = useQuery({
     queryKey: ['my-favorites', 1, 1],
     queryFn: ({ signal }) =>
       getMyFavoriteMovies({ page: 1, limit: 1 }, signal),
   });
+  const countsPending = reviewsPending || moviesPending || favoritesPending;
 
   const counts: Record<LkMenuCountKey, number | undefined> = {
     reviews: reviews?.total,
@@ -78,7 +85,9 @@ export function LkLayout() {
                   end={item.end}
                   label={item.label}
                   rightSection={
-                    item.countKey && counts[item.countKey] !== undefined && (
+                    item.countKey &&
+                    !countsPending &&
+                    counts[item.countKey] !== undefined && (
                       <Badge size="sm" variant="filled">
                         {counts[item.countKey]}
                       </Badge>

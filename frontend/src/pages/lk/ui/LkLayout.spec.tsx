@@ -85,16 +85,34 @@ describe('LkLayout', () => {
   });
 
   it('does not show counters before count queries have loaded', () => {
-    mocks.useMyReviews.mockReturnValue({ data: undefined });
-    mocks.useMyMovies.mockReturnValue({ data: undefined });
-    mocks.useQuery.mockReturnValue({ data: undefined });
+    mocks.useMyReviews.mockReturnValue({
+      data: { total: 4 },
+      isPending: false,
+    });
+    mocks.useMyMovies.mockReturnValue({
+      data: { total: 2 },
+      isPending: false,
+    });
+    mocks.useQuery.mockReturnValue({ data: undefined, isPending: true });
 
-    render(<LkLayout />);
+    const { rerender } = render(<LkLayout />);
 
     expect(screen.queryByTestId('counter')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Избранное' })).toHaveAttribute(
       'href',
       ERoutes.LK_FAVORITES,
     );
+
+    mocks.useQuery.mockReturnValue({
+      data: { total: 7 },
+      isPending: false,
+    });
+    rerender(<LkLayout />);
+
+    expect(screen.getAllByTestId('counter').map((counter) => counter.textContent)).toEqual([
+      '4',
+      '2',
+      '7',
+    ]);
   });
 });

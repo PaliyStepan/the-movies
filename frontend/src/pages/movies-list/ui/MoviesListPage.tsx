@@ -1,4 +1,4 @@
-import {useSearchParams} from 'react-router-dom';
+import {Link, useSearchParams} from 'react-router-dom';
 import {useDebouncedValue} from '@mantine/hooks';
 import {
   TextInput,
@@ -9,16 +9,18 @@ import {
   Title,
   Text,
   Loader,
-  Center,
+  Center, Group, Button,
 } from '@mantine/core';
 import {useState, useEffect} from 'react';
 import {MovieCard, useMovies} from '@/entities/movie';
+import {useAuthStore} from "@/shared/auth/auth.store.ts";
+import {ERoutes} from "@/shared/config/routes.ts";
 
 const SearchInput = ({
-     value,
-     onChange,
-     onClear,
-   }: {
+                       value,
+                       onChange,
+                       onClear,
+                     }: {
   value: string;
   onChange: (value: string) => void;
   onClear: () => void;
@@ -36,13 +38,16 @@ const SearchInput = ({
 };
 
 export function MoviesListPage() {
+  const user = useAuthStore((s) => s.user);
+  const isInitialized = useAuthStore((s) => s.isInitialized);
+
   const [searchParams, setSearchParams] = useSearchParams();
 
   const search = searchParams.get('search') ?? '';
   const page = Number(searchParams.get('page') ?? '1');
 
-  const [input, setInput] = useState(search);
-  const [debouncedInput] = useDebouncedValue(input, 500);
+  const [searchInput, setSearchInput] = useState(search);
+  const [debouncedInput] = useDebouncedValue(searchInput, 500);
 
   useEffect(() => {
     if (debouncedInput === search) return;
@@ -62,11 +67,11 @@ export function MoviesListPage() {
   });
 
   const handleSearchChange = (value: string) => {
-    setInput(value);
+    setSearchInput(value);
   };
 
   const handleClear = () => {
-    setInput('');
+    setSearchInput('');
     const params = new URLSearchParams(searchParams);
     params.delete('search');
     params.set('page', '1');
@@ -81,10 +86,19 @@ export function MoviesListPage() {
 
   return (
     <Stack gap="lg">
-      <Title order={2}>Фильмы</Title>
+
+      <Group gap="sm" justify="space-between">
+        <Title order={2}>Фильмы</Title>
+
+        {isInitialized && user &&
+          <Button component={Link} to={ERoutes.MOVIE_CREATE} variant="light">
+              Создать фильм
+          </Button>
+        }
+      </Group>
 
       <SearchInput
-        value={input}
+        value={searchInput}
         onChange={handleSearchChange}
         onClear={handleClear}
       />

@@ -20,18 +20,30 @@ export function Header() {
           <Group gap="sm">
             {!isInitialized ? null : user ? (
               <>
-                <Button component={Link} to={ERoutes.LK} variant="subtle">
+                <Button
+                  component={Link}
+                  to={ERoutes.LK}
+                  variant="subtle"
+                  maw={120}
+                  styles={{
+                    label: {
+                      display: 'block',
+                      minWidth: 0,
+                      maxWidth: '100%',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      height: 'auto'
+                    },
+                  }}
+                  title={user.name}
+                >
                   {user.name}
                 </Button>
 
-                <Group gap="sm">
-                  <Button component={Link} to={ERoutes.MOVIE_CREATE} variant="light">
-                    Создать фильм
-                  </Button>
-                  <Button variant="outline" onClick={() => logoutMutation.mutate()} loading={logoutMutation.isPending}>
-                    Выйти
-                  </Button>
-                </Group>
+                <Button variant="outline" onClick={() => logoutMutation.mutate()} loading={logoutMutation.isPending}>
+                  Выйти
+                </Button>
               </>
             ) : (
               <>
