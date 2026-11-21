@@ -67,3 +67,5 @@ Backend must be running (see `../backend/README.md`).
 | `npm run build` | Production build to `dist/` |
 | `npm run preview` | Preview production build |
 | `npm run lint` | ESLint |
+| `npm test` | Run unit tests once with Vitest |
+| `npm run test:watch` | Run unit tests in watch mode |
